@@ -81,6 +81,8 @@ x_init = zeros(12,1);
 
 x = [x_init zeros(length(x_init),length(t)-1)];
 
+% Damping effects
+% TODO: Verify
 b_x = 74/(4/3.6)^2;
 b_y = b_x;
 b_z = 57.4/(1/3.6)^2;
@@ -88,26 +90,32 @@ b_rol = b_x;
 b_pit = b_x;
 b_yaw = b_x;
 
-% Positions of any features relative to centre mass
-feat_off = [ 0,  0, l1,-l2, l1;
-           w1,-w1, w2,  0,-w2;
-            0,  0,  0,  0,  0;];
-% Order of which the features are connected by line
-draw_order = [1,4,2,5,3,1];
-
 % Disturbance Covariance5
 Q = diag([0.001, 0.001, 0.001,     ... Position Disturbance
           0.002, 0.002, 0.002,     ... Orientation Disturbance
-          0.001, 0.001, 0.001,     ... Velocity Disturbance
-          0.002, 0.002, 0.002].^2);... Ang. Velocity Disturbance
+          0.000, 0.000, 0.000,     ... Velocity Disturbance
+          0.000, 0.000, 0.000].^2);... Ang. Velocity Disturbance
 [REx, Rex] = eig(Q);
+
+% IMU Position Offset from CG
+imu_off = [0.25; 0; 0.05];
+
 rov = struct('J',[Jx,Jy,Jz],...
              'B',[b_x,b_y,b_z,b_rol,b_pit,b_yaw],...
              'M',M,...
              'W',[w1,w2],...
              'L',[l1,l2],...
              'REx',REx,...
-             'Rex',Rex);
+             'Rex',Rex,...
+             'IMU',imu_off);
+
+% Positions of any features relative to centre mass
+feat_off = [ 0,  0, l1,-l2, l1;
+            w1,-w1, w2,  0,-w2;
+             0,  0,  0,  0,  0;];
+% Order of which the features are connected by line
+draw_order = [1,4,2,5,3,1];
+
 for k = 1:length(t)-1
     %% Inertial Frame to Body Frame
     rol = x(4,k);
@@ -122,6 +130,9 @@ for k = 1:length(t)-1
     x_feat(3,:) = x_feat(3,:) + x(3,k);
     
     %% Simulated Motion Model Update
+    if (k*dt > 10)
+        u(1:2) = 0;
+    end
     x(:,k+1) = motion_model(x(:,k),u,dt,rov);
     
     %% Plot
