@@ -72,8 +72,8 @@ f = cell(12,1); %creates 12 cells for x_dot = f(...) functions
 dt = 0.1;
 t = 0:dt:1000; % simulation time/period in seconds
 u = zeros(5, length(t));
-u(1, :) = 1;
-u(2, :) = 3;
+u(1, 1:10) = 1;
+u(2, 1:10) = 3;
 u(3, :) = 0;
 u(5, :) = 0;
 u(4, :) = 0;
@@ -126,7 +126,7 @@ for k = 1:length(t)-1
     x_feat(3,:) = x_feat(3,:) + x(3,k);
     
     % Simulated Motion Model Update
-    x(:,k+1) = motion_model(x(:,k),u,dt,rov);
+    x(:,k+1) = motion_model(x(:,k),u(:,k),dt,rov);
     
     % Plot
     if (mod(k, 100) == 0)
