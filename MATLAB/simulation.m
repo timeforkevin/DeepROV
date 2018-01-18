@@ -1,3 +1,6 @@
+clc;
+close all;
+
 %% Vehicle Parameters
 m_body = 21.10095;  % mass of pipe body with domes (from solidworks) [kg]
 m_frame = 15.04264; % mass of fram (from solidworks) [kg]
@@ -41,9 +44,6 @@ C_D_plate = 1.28;   % drag coefficient for a plate (nasa)
 Keff = 0.5;     %eff. of elec to mech power in motor+prop []
 
 %% Paramter Calculations
-% m_fuselag = rho_acryl*sH*sW*sL;
-% m_frame = 3*m_side;
-% M = 36.14359; % [kg] from solidworks
 M = m_body+m_frame+m_elec; % total mass of sub
 
 %assuming thin pipe and solid sides
@@ -73,16 +73,14 @@ dt = 0.1;
 t = 0:dt:1000; % simulation time/period in seconds
 u = zeros(5, length(t));
 u(1, :) = 1;
-u(2, :) = 1;
-u(3, :) = 10;
-u(5, :) = -10;
+u(2, :) = 3;
+u(3, :) = 0;
+u(5, :) = 0;
 u(4, :) = 0;
 x_init = zeros(12,1);
 
 x = [x_init zeros(length(x_init),length(t)-1)];
 
-% Damping effects
-% TODO: Verify
 b_x = 74/(4/3.6)^2;
 b_y = b_x;
 b_z = 57.4/(1/3.6)^2;
@@ -90,58 +88,53 @@ b_rol = b_x;
 b_pit = b_x;
 b_yaw = b_x;
 
+%% Set-up
+
+% Positions of any features relative to centre mass
+feat_off = [ 0,  0, l1,-l2, l1;
+           w1,-w1, w2,  0,-w2;
+            0,  0,  0,  0,  0;];
+% Order of which the features are connected by line
+draw_order = [1,4,2,5,3,1];
+
 % Disturbance Covariance5
 Q = diag([0.001, 0.001, 0.001,     ... Position Disturbance
           0.002, 0.002, 0.002,     ... Orientation Disturbance
-          0.000, 0.000, 0.000,     ... Velocity Disturbance
-          0.000, 0.000, 0.000].^2);... Ang. Velocity Disturbance
+          0.001, 0.001, 0.001,     ... Velocity Disturbance
+          0.002, 0.002, 0.002].^2);... Ang. Velocity Disturbance
 [REx, Rex] = eig(Q);
-
-% IMU Position Offset from CG
-imu_off = [0.25; 0; 0.05];
-
 rov = struct('J',[Jx,Jy,Jz],...
              'B',[b_x,b_y,b_z,b_rol,b_pit,b_yaw],...
              'M',M,...
              'W',[w1,w2],...
              'L',[l1,l2],...
              'REx',REx,...
-             'Rex',Rex,...
-             'IMU',imu_off);
-
-% Positions of any features relative to centre mass
-feat_off = [ 0,  0, l1,-l2, l1;
-            w1,-w1, w2,  0,-w2;
-             0,  0,  0,  0,  0;];
-% Order of which the features are connected by line
-draw_order = [1,4,2,5,3,1];
-
+             'Rex',Rex);
+         
+%% Simulate
 for k = 1:length(t)-1
-    %% Inertial Frame to Body Frame
+    % Inertial Frame to Body Frame
     rol = x(4,k);
     pit = x(5,k);
     yaw = x(6,k);
     R = eul2rotm([yaw, pit, rol]);
     
-    %% Inertial frame Feature positions
+    % Inertial frame Feature positions
     x_feat = R'*feat_off;
     x_feat(1,:) = x_feat(1,:) + x(1,k);
     x_feat(2,:) = x_feat(2,:) + x(2,k);
     x_feat(3,:) = x_feat(3,:) + x(3,k);
     
-    %% Simulated Motion Model Update
-    if (k*dt > 10)
-        u(1:2) = 0;
-    end
+    % Simulated Motion Model Update
     x(:,k+1) = motion_model(x(:,k),u,dt,rov);
     
-    %% Plot
+    % Plot
     if (mod(k, 100) == 0)
         figure(1)
         clf
         hold on
-        plot3(x(1,1:k+1),x(2,1:k+1),x(3,1:k+1), '-r',...
-              x_feat(1,draw_order),x_feat(2,draw_order),x_feat(3,draw_order),'-r')
+        plot3(x(1,1:k+1),x(2,1:k+1),x(3,1:k+1), '--r',...
+              x_feat(1,draw_order),x_feat(2,draw_order),x_feat(3,draw_order),'-k')
         plot3(x(1,k+1),x(2,k+1),x(3,k+1),'xr', ...
               x_feat(1,:),x_feat(2,:),x_feat(3,:),'og');
         view(3)
@@ -154,9 +147,3 @@ for k = 1:length(t)-1
 end
 
 %% Controllers
-
-
-
-
-
-
