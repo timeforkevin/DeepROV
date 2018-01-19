@@ -1,6 +1,9 @@
+clc;
+close all;
+
 %% Vehicle Parameters
-m_body = 21.10095;  % mass of pipe body with domes (from solidworks) [kg]
-m_frame = 15.04264; % mass of fram (from solidworks) [kg]
+m_body = 5.289;  % mass of pipe body with domes (from solidworks) [kg]
+m_frame = 3; % mass of fram (from solidworks) [kg]
 m_elec = 5;         % mass of electrical components [kg]
 
 D = 0.18542;   % pipe outer diameter [m]
@@ -20,9 +23,9 @@ A_sp = 0.00456;     % area of side plates [m^2]
 
 rho_acryl = 1190;   % density of acrylic [kg/m^3]
 
-w1 = W/2;
-w2 = w1-sT;
-l1 = L/2;
+w1 = 0.19; % distance of 'handling' motors from center
+w2 = w1; % distance of 'drive' motors from center
+l1 = L/2; %s
 l2 = L/2;
 
 %% Performance Requirements
@@ -41,9 +44,6 @@ C_D_plate = 1.28;   % drag coefficient for a plate (nasa)
 Keff = 0.5;     %eff. of elec to mech power in motor+prop []
 
 %% Paramter Calculations
-% m_fuselag = rho_acryl*sH*sW*sL;
-% m_frame = 3*m_side;
-% M = 36.14359; % [kg] from solidworks
 M = m_body+m_frame+m_elec; % total mass of sub
 
 %assuming thin pipe and solid sides
@@ -72,10 +72,10 @@ f = cell(12,1); %creates 12 cells for x_dot = f(...) functions
 dt = 0.1;
 t = 0:dt:1000; % simulation time/period in seconds
 u = zeros(5, length(t));
-u(1, :) = 1;
-u(2, :) = 1;
-u(3, :) = 10;
-u(5, :) = -10;
+u(1, 1:10) = 1;
+u(2, 1:10) = 3;
+u(3, :) = 0;
+u(5, :) = 0;
 u(4, :) = 0;
 x_init = zeros(12,1);
 
@@ -88,13 +88,20 @@ b_rol = b_x;
 b_pit = b_x;
 b_yaw = b_x;
 
-mot_off = [ 0,  0, l1,-l2, l1;
+%% Set-up
+
+% Positions of any features relative to centre mass
+feat_off = [ 0,  0, l1,-l2, l1;
            w1,-w1, w2,  0,-w2;
             0,  0,  0,  0,  0;];
+% Order of which the features are connected by line
+draw_order = [1,4,2,5,3,1];
+
+% Disturbance Covariance
 Q = diag([0.001, 0.001, 0.001,     ... Position Disturbance
-          0.005, 0.001, 0.001,     ... Orientation Disturbance
-          0.00, 0.00, 0.00,     ... Velocity Disturbance
-          0.00, 0.00, 0.00].^2);... Ang. Velocity Disturbance
+          0.002, 0.002, 0.002,     ... Orientation Disturbance
+          0.001, 0.001, 0.001,     ... Velocity Disturbance
+          0.002, 0.002, 0.002].^2);... Ang. Velocity Disturbance
 [REx, Rex] = eig(Q);
 rov = struct('J',[Jx,Jy,Jz],...
              'B',[b_x,b_y,b_z,b_rol,b_pit,b_yaw],...
@@ -103,6 +110,8 @@ rov = struct('J',[Jx,Jy,Jz],...
              'L',[l1,l2],...
              'REx',REx,...
              'Rex',Rex);
+         
+%% Simulate
 for k = 1:length(t)-1
     % Inertial Frame to Body Frame
     rol = x(4,k);
@@ -110,25 +119,24 @@ for k = 1:length(t)-1
     yaw = x(6,k);
     R = eul2rotm([yaw, pit, rol]);
     
-    % Inertial frame motor positions
-    x_mot = R'*mot_off;
-    x_mot(1,:) = x_mot(1,:) + x(1,k);
-    x_mot(2,:) = x_mot(2,:) + x(2,k);
-    x_mot(3,:) = x_mot(3,:) + x(3,k);
+    % Inertial frame Feature positions
+    x_feat = R'*feat_off;
+    x_feat(1,:) = x_feat(1,:) + x(1,k);
+    x_feat(2,:) = x_feat(2,:) + x(2,k);
+    x_feat(3,:) = x_feat(3,:) + x(3,k);
     
     % Simulated Motion Model Update
-    x(:,k+1) = motion_model(x(:,k),u,dt,rov);
+    x(:,k+1) = motion_model(x(:,k),u(:,k),dt,rov);
     
     % Plot
     if (mod(k, 100) == 0)
         figure(1)
         clf
         hold on
-        mot_order = [1,4,2,5,3,1];
-        plot3(x(1,1:k+1),x(2,1:k+1),x(3,1:k+1), '-r',...
-              x_mot(1,mot_order),x_mot(2,mot_order),x_mot(3,mot_order),'-r')
+        plot3(x(1,1:k+1),x(2,1:k+1),x(3,1:k+1), '--r',...
+              x_feat(1,draw_order),x_feat(2,draw_order),x_feat(3,draw_order),'-k')
         plot3(x(1,k+1),x(2,k+1),x(3,k+1),'xr', ...
-              x_mot(1,:),x_mot(2,:),x_mot(3,:),'og');
+              x_feat(1,:),x_feat(2,:),x_feat(3,:),'og');
         view(3)
         axis equal
         xlabel('x')
@@ -139,9 +147,3 @@ for k = 1:length(t)-1
 end
 
 %% Controllers
-
-
-
-
-
-

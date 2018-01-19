@@ -10,7 +10,7 @@ function [ x_next ] = motion_model( x, u, dt, rov )
     
     %% Constant Velocity Pose updates
     x_next = zeros(12,1);
-    Ex = 0;%rov.REx*sqrt(rov.Rex)*randn(12,1); %noise
+    Ex = rov.REx*sqrt(rov.Rex)*randn(12,1); %noise
     % Position
     x_next(1:3) = x(1:3) + x(7:9)*dt;
     % Orientation
