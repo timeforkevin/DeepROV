@@ -13,6 +13,6 @@ bool LeakDetector::detect() {
     for(int i = 0; i < _num_pins; i++) {
         int leak_state = digitalRead(_pins[i]);
         if (leak_state == HIGH) return true;
-        else if (leak_state == LOW) return false;
     }
+    return false;
 }
