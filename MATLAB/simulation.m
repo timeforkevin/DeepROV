@@ -1,5 +1,5 @@
 clc;
-close all;
+clear all;
 
 %% Vehicle Parameters
 m_body = 21.10095;  % mass of pipe body with domes (from solidworks) [kg]
@@ -7,8 +7,8 @@ m_frame = 15.04264; % mass of fram (from solidworks) [kg]
 m_elec = 5;         % mass of electrical components [kg]
 
 D = 0.18542;   % pipe outer diameter [m]
-L = 1.16;      % sub body length [m]
-W = 0.52635;% frame width [m] 
+L = 0.75;      % sub body length [m]
+W = 0.35;% frame width [m] 
 
 sH = 0.6;   % height of side plates [m]
 sL = 1.27;  % length of side plates [m]
@@ -54,11 +54,11 @@ Jz = 55.75488;  % (from solidworks) [kg m^2]
 
 %Dampers
 bx = 74;   %based off 74N of resistance at 1 m/s (from CFD)
-by = 0;
-bz = 0;
-bphi = 0;  %assume water friction is negligable (~5mN)
-btheta = 0;
-bpsi = 0;
+by = 74;
+bz = 74;
+bphi = 74;  %assume water friction is negligable (~5mN)
+btheta = 74;
+bpsi = 74;
 
 
 %% State Space Model
@@ -72,17 +72,11 @@ f = cell(12,1); %creates 12 cells for x_dot = f(...) functions
 dt = 0.1;
 t = 0:dt:1000; % simulation time/period in seconds
 u = zeros(5, length(t));
-u(1, 1:10) = 1;
-u(2, 1:10) = 3;
-u(3, :) = 0;
-u(5, :) = 0;
-u(4, :) = 0;
-x_init = zeros(12,1);
-
-x = [x_init zeros(length(x_init),length(t)-1)];
+x = zeros(12, length(t));
+e = zeros(3, length(t));
 
 b_x = 74/(4/3.6)^2;
-b_y = b_x;
+b_y = 10*b_x;
 b_z = 57.4/(1/3.6)^2;
 b_rol = b_x;
 b_pit = b_x;
@@ -97,7 +91,7 @@ feat_off = [ 0,  0, l1,-l2, l1;
 % Order of which the features are connected by line
 draw_order = [1,4,2,5,3,1];
 
-% Disturbance Covariance5
+% Disturbance Covariance
 Q = diag([0.001, 0.001, 0.001,     ... Position Disturbance
           0.002, 0.002, 0.002,     ... Orientation Disturbance
           0.001, 0.001, 0.001,     ... Velocity Disturbance
@@ -110,14 +104,17 @@ rov = struct('J',[Jx,Jy,Jz],...
              'L',[l1,l2],...
              'REx',REx,...
              'Rex',Rex);
-         
+waypoints = [  0,  1,   2,   3,   4,   5,   6,   7,   8;
+              -1, -1,  -1,-1.5,-2.5,-3.5,-4.0,-4.0,-4.0;
+               1,  1, 1.5, 1.5,   2,   2,   2,   2,   2;];
+way_idx = 1;
 %% Simulate
 for k = 1:length(t)-1
     % Inertial Frame to Body Frame
     rol = x(4,k);
     pit = x(5,k);
     yaw = x(6,k);
-    R = eul2rotm([yaw, pit, rol]);
+    R = R3D(yaw, pit, rol);
     
     % Inertial frame Feature positions
     x_feat = R'*feat_off;
@@ -126,22 +123,135 @@ for k = 1:length(t)-1
     x_feat(3,:) = x_feat(3,:) + x(3,k);
     
     % Simulated Motion Model Update
-    x(:,k+1) = motion_model(x(:,k),u(:,k),dt,rov);
+    x(:,k+1) = motion_model(x(:,k),u(:,k),dt,rov,true);
     
-    % Plot
-    if (mod(k, 100) == 0)
+    
+%% Outer Loop Non Linear Steering Controller
+    K_STEER = 10;
+    K_SOFT = 10;
+    K_VEL = 1;
+    tar_vel = 0.1;
+
+    prev_point = waypoints(1:2, way_idx)';
+    next_point = waypoints(1:2, way_idx+1)';
+    curr_point = x(1:2, k)';
+    traj_angle = atan2(next_point(2)-prev_point(2), next_point(1)-prev_point(1));
+    e_h = wrapToPi(x(6, k) - traj_angle);
+    [e_ct, completion] = distanceToLineSegment(prev_point, next_point, curr_point);
+    
+    
+    e(1, k) = e_ct; % Record Cross Track Error XY
+
+    
+    steer = wrapToPi(e_h/2 + atan2(K_STEER*e_ct, K_SOFT-tar_vel));
+    
+%% Inner Loop Controller
+    % Inputs: Z height, Roll, Pitch
+    % Controls: 3 Motors
+    delta = 0.001;
+    
+    ui_bar = zeros(5, 1);
+    x_bar = zeros(12, 1);
+    x_bar(1:2) = waypoints(1:2, way_idx);
+    x_bar(3) = waypoints(3, way_idx) +...
+               (completion+0.2)*(waypoints(3, way_idx+1)-waypoints(3, way_idx));
+    x_bar(6) = steer;
+
+    % Record Cross Track Error Z
+    e(2, k) = x(3, k) - (waypoints(3, way_idx) +...
+              completion*(waypoints(3, way_idx+1)-waypoints(3, way_idx)));
+
+    % Linearization
+    Ai = zeros(8, 8);
+    Bi = zeros(8, 3);
+    f_bar = motion_model(x(:,k),ui_bar,dt,rov,false);
+    states_i = [3 4 5 6 9 10 11 12];
+    for i = 1:8
+        dx = zeros(12, 1); dx(states_i(i)) = delta;
+        df_dxi = (f_bar-motion_model(x(:,k)+dx,ui_bar,dt,rov,false))/delta;
+        df_dxi([4:6, 10:12]) = wrapToPi(df_dxi([4:6, 10:12]));
+        Ai(:, i) = df_dxi(states_i);
+    end
+    motors_i = [1 2 3 4 5];
+    for i = 1:5
+        du = zeros(5, 1); du(motors_i(i)) = delta;
+        df_dui = (f_bar-motion_model(x(:,k),ui_bar+du,dt,rov,false))/delta;
+        df_dui([4:6, 10:12]) = wrapToPi(df_dui([4:6, 10:12]));
+        Bi(:, i) = df_dui(states_i);
+    end
+    % Weights
+    Qi = diag([1 1 1 100 0.1 0.1 0.1 0.001]);
+    Ri = diag([0.01 0.01 0.1 0.1 0.1]);
+    Kinner = dlqr(Ai,Bi,Qi,Ri);
+    
+    % Determine Inputs
+    dx = x_bar-x(:,k);
+    dx([4:6, 10:12]) = wrapToPi(dx([4:6, 10:12]));
+    dx = dx(states_i);
+    cur_vel = norm(x(7:8,k));
+    u(motors_i, k+1) = Kinner*(dx);
+    u(1:2,k+1) = u(1:2,k+1) - mean(u(1:2,k+1)) + K_VEL*(tar_vel-cur_vel);
+
+    
+    %% Update Waypoint
+    if (completion > 1)
+        way_idx = way_idx + 1;
+        if (way_idx == length(waypoints))
+            break;
+        end
+    end
+
+%% Plot
+    if (mod(k, 10) == 0)
         figure(1)
         clf
+        subplot(4, 1, 1:2)
         hold on
         plot3(x(1,1:k+1),x(2,1:k+1),x(3,1:k+1), '--r',...
               x_feat(1,draw_order),x_feat(2,draw_order),x_feat(3,draw_order),'-k')
         plot3(x(1,k+1),x(2,k+1),x(3,k+1),'xr', ...
               x_feat(1,:),x_feat(2,:),x_feat(3,:),'og');
+        plot3(waypoints(1, :),...
+              waypoints(2, :),...
+              waypoints(3, :), '-b');
+        
+        
+        projections = repmat(x(1:3,k+1), 1, 3);
+        projections(2, 1) = 0;
+        projections(3, 3) = 0;
+        plot3(projections(1, :),projections(2, :),projections(3, :),'-r');
+        
+        plot3(projections(1, 1),projections(2, 1),projections(3, 1),'xr');
+        plot3(waypoints(1, :),...
+              waypoints(2, :),...
+              0*waypoints(3, :), '-c');
+        plot3(projections(1, 3),projections(2, 3),projections(3, 3),'xr');
+        plot3(waypoints(1, :),...
+              0*waypoints(2, :),...
+              waypoints(3, :), '-c');
+        grid on;
+        title('Simulation')
         view(3)
         axis equal
         xlabel('x')
         ylabel('y')
         zlabel('z')
+        
+        subplot(4, 1, 3)
+        plot(e(1,1:k))
+%         plot(x(1,k+1),x(2,k+1),'xr');
+%         plot(waypoints(1, :),...
+%              waypoints(2, :),...
+%              '-b');
+        grid on;
+        title('Cross Track Error XY Plane')
+        subplot(4, 1, 4)
+        plot(e(2,1:k))
+%         plot(x(1,k+1),x(3,k+1),'xr');
+%         plot(waypoints(1, :),...
+%              waypoints(3, :), '-b');
+        grid on;
+        title('Cross Track Error XZ Height')
         drawnow;
     end
 end
