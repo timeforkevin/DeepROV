@@ -1,9 +1,13 @@
 clc;
+<<<<<<< HEAD
 clear all;
+=======
+close all;
+>>>>>>> 6e82deec61da6c0a3d32c53c27ccbb45e9a040de
 
 %% Vehicle Parameters
-m_body = 21.10095;  % mass of pipe body with domes (from solidworks) [kg]
-m_frame = 15.04264; % mass of fram (from solidworks) [kg]
+m_body = 5.289;  % mass of pipe body with domes (from solidworks) [kg]
+m_frame = 3; % mass of fram (from solidworks) [kg]
 m_elec = 5;         % mass of electrical components [kg]
 
 D = 0.18542;   % pipe outer diameter [m]
@@ -23,9 +27,9 @@ A_sp = 0.00456;     % area of side plates [m^2]
 
 rho_acryl = 1190;   % density of acrylic [kg/m^3]
 
-w1 = W/2;
-w2 = w1-sT;
-l1 = L/2;
+w1 = 0.19; % distance of 'handling' motors from center
+w2 = w1; % distance of 'drive' motors from center
+l1 = L/2; %s
 l2 = L/2;
 
 %% Performance Requirements
@@ -72,8 +76,19 @@ f = cell(12,1); %creates 12 cells for x_dot = f(...) functions
 dt = 0.1;
 t = 0:dt:1000; % simulation time/period in seconds
 u = zeros(5, length(t));
+<<<<<<< HEAD
 x = zeros(12, length(t));
 e = zeros(3, length(t));
+=======
+u(1, 1:10) = 1;
+u(2, 1:10) = 3;
+u(3, :) = 0;
+u(5, :) = 0;
+u(4, :) = 0;
+x_init = zeros(12,1);
+
+x = [x_init zeros(length(x_init),length(t)-1)];
+>>>>>>> 6e82deec61da6c0a3d32c53c27ccbb45e9a040de
 
 b_x = 74/(4/3.6)^2;
 b_y = 10*b_x;
@@ -104,10 +119,14 @@ rov = struct('J',[Jx,Jy,Jz],...
              'L',[l1,l2],...
              'REx',REx,...
              'Rex',Rex);
+<<<<<<< HEAD
 waypoints = [0,1,   2,   3,   4,   5,   6,   7,   8;
              0,0,   0,-0.5,-1.5,-2.5,-3.0,-3.0,-3.0;
              1,1, 1.5, 1.5,   2,   2,   2,   2,   2;];
 way_idx = 1;
+=======
+         
+>>>>>>> 6e82deec61da6c0a3d32c53c27ccbb45e9a040de
 %% Simulate
 for k = 1:length(t)-1
     % Inertial Frame to Body Frame
@@ -123,6 +142,7 @@ for k = 1:length(t)-1
     x_feat(3,:) = x_feat(3,:) + x(3,k);
     
     % Simulated Motion Model Update
+<<<<<<< HEAD
     x(:,k+1) = motion_model(x(:,k),u(:,k),dt,rov,true);
     
     
@@ -138,6 +158,9 @@ for k = 1:length(t)-1
     traj_angle = atan2(next_point(2)-prev_point(2), next_point(1)-prev_point(1));
     e_h = wrapToPi(x(6, k) - traj_angle);
     [e_ct, completion] = distanceToLineSegment(prev_point, next_point, curr_point);
+=======
+    x(:,k+1) = motion_model(x(:,k),u(:,k),dt,rov);
+>>>>>>> 6e82deec61da6c0a3d32c53c27ccbb45e9a040de
     
     
     e(1, k) = e_ct; % Record Cross Track Error XY
@@ -211,6 +234,7 @@ for k = 1:length(t)-1
               x_feat(1,draw_order),x_feat(2,draw_order),x_feat(3,draw_order),'-k')
         plot3(x(1,k+1),x(2,k+1),x(3,k+1),'xr', ...
               x_feat(1,:),x_feat(2,:),x_feat(3,:),'og');
+<<<<<<< HEAD
         plot3(waypoints(1, :),...
               waypoints(2, :),...
               waypoints(3, :), '-b');
@@ -231,6 +255,8 @@ for k = 1:length(t)-1
               waypoints(3, :), '-c');
         grid on;
         title('Simulation')
+=======
+>>>>>>> 6e82deec61da6c0a3d32c53c27ccbb45e9a040de
         view(3)
         axis equal
         xlabel('x')

@@ -2,8 +2,8 @@ clc;
 clear all;
 
 %% Vehicle Parameters
-m_body = 21.10095;  % mass of pipe body with domes (from solidworks) [kg]
-m_frame = 15.04264; % mass of fram (from solidworks) [kg]
+m_body = 5.289;  % mass of pipe body with domes (from solidworks) [kg]
+m_frame = 3; % mass of fram (from solidworks) [kg]
 m_elec = 5;         % mass of electrical components [kg]
 
 D = 0.18542;   % pipe outer diameter [m]
@@ -23,10 +23,10 @@ A_sp = 0.00456;     % area of side plates [m^2]
 
 rho_acryl = 1190;   % density of acrylic [kg/m^3]
 
-w1 = W/2;
-w2 = w1-sT;
-l1 = L/2;
-l2 = L/2;
+w1 = 0.19; % distance of 'handling' motors from center
+w2 = w1; % distance of 'drive' motors from center
+l1 = 0.29; % distance of front handling motors from center
+l2 = 0.29; % distance of rear hanling motor from center
 
 %% Performance Requirements
 roll_time = 1; % settling time for rolling
