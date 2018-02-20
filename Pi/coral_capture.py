@@ -6,9 +6,10 @@ class NoWebCamException(Exception):
     pass
 
 class CoralCapture:
-    def __init__(self, fps):
+    def __init__(self, fps, folder):
         self.camera = cv2.VideoCapture(0)
         self.fps = fps
+        self.folder = folder
         if not self.camera.isOpened():
             raise NoWebCamException
 
@@ -24,7 +25,8 @@ class CoralCapture:
         frame_width = int(self.camera.get(3))
         frame_height = int(self.camera.get(4))
 
-        file_name = time.strftime("%a_%d-%m-%y_%H-%M-%S.avi", time.localtime())
+        file_name = time.strftime(
+            "{}/%a_%d-%m-%y_%H-%M-%S.avi.".format(self.folder), time.localtime())
         print("writing to file: {}".format(file_name))
         video_writter = cv2.VideoWriter(
             file_name,
