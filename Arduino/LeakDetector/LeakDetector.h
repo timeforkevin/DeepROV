@@ -2,9 +2,8 @@
 
 class LeakDetector {
 public:
-    LeakDetector(int input_pins[], int num_pins);
+    LeakDetector(int input_pin);
     bool detect();
 private:
-    int _pins[];
-    int _num_pins;
+    int _input_pin;
 };

@@ -1,18 +1,12 @@
 #include "Arduino.h"
 #include "LeakDetector.h"
 
-LeakDetector::LeakDetector(int pins[], int num_pins) {
-    _num_pins = num_pins;
-    for(int i = 0; i < _num_pins; i++) {
-        _pins[i] = pins[i];
-        pinMode(_pins[i], INPUT);
-    }
+LeakDetector::LeakDetector(int input_pin) {
+    _input_pin = input_pin;
+    pinMode(_input_pin, INPUT);
 }
 
 bool LeakDetector::detect() {
-    for(int i = 0; i < _num_pins; i++) {
-        int leak_state = digitalRead(_pins[i]);
-        if (leak_state == HIGH) return true;
-    }
+    if (digitalRead(_input_pin) == HIGH) return true;
     return false;
 }
