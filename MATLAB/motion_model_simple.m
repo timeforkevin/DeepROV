@@ -1,33 +1,20 @@
-function [ x_next ] = motion_model_simple( x, u, dt, rov )
-%UNTITLED Summary of this function goes here
+function [ A, B ] = motion_model_simple( dt, rov )
+%Simplified Model of Attitude + Height
 %   Detailed explanation goes here
-    
-    J = rov.J;
-    M = rov.M;
-    W = rov.W;
+    % States: Z Height, Roll, Pitch, Yaw
+    b = rov.B;
+    j = rov.J;
+    m = rov.M;
+    w = rov.W;
     L = rov.L;
     
-    %% Constant Velocity Pose updates
-    x_next = x;
-    % Position
-    x_next(1:3) = x(1:3) + x(7:9)*dt;
-    % Orientation
-    x_next(4:6) = x(4:6) + x(10:12)*dt;
-
-    % Inertial Frame to Body Frame
-    r = x_next(4);
-    p = x_next(5);
-    y = x_next(6);
-    R = R3D(y, p, r);
+    A = diag([1 1 1 1 1 1 1 1]);
+%     A = diag([1 1 1 1 1 1 1 1]);
+    A(1:4,5:8) = diag([dt dt dt dt]);
     
-    % Angular Velocity
-    x_next(10:12) = x(10:12)+ R'*[(W(2)*(u(5)-u(3)))/J(1);
-                                  (L(2)*u(4)-L(1)*(u(3)+u(5)))/J(2); %neglect off axis effect on bottom
-                                  (W(1)*(u(2)-u(1)))/J(3)]*dt; %neglect off axis effects for sides
-
-    % Body Frame Acceleration due to rotation rate
-    % Velocity
-    x_next(7:9) = x(7:9)+ R'*[(u(1)+u(2));
-                              0;
-                              (u(3)+u(4)+u(5));]/M*dt;
+    B = zeros(8,5);
+    B(5:8,:) = [0, 0, 1/m, 1/m, 1/m;
+                0, 0, -w(2)/j(1), 0, w(2)/j(1);
+                0, 0, -L(1)/j(2), L(2)/j(2), -L(1)/j(2);
+                -w(1)/j(3), w(1)/j(3), 0, 0, 0;]/dt;
 end

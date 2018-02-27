@@ -11,6 +11,6 @@ function [ R ] = R3D( y, p, r )
     Rz = [cos(y), -sin(y), 0;
           sin(y),  cos(y), 0;
                0,       0, 1;];
-    R = Rz*Ry*Rx;
+    R = Rx*Ry*Rz;
 end
 

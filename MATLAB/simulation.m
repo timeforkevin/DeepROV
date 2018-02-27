@@ -46,6 +46,7 @@ dt = 0.1;
 t = 0:dt:1000; % simulation time/period in seconds
 u = zeros(5, length(t));
 x = zeros(12, length(t));
+x(2:3,1) = [-2;1];
 y_IMU = zeros(9, length(t));
 mu = zeros(12, length(t));
 cov = zeros(12, 12, length(t));
@@ -77,12 +78,18 @@ rov_sim = struct('J',[Jx,Jy,Jz],...
              'REx',REx,...
              'Rex',Rex,...
              'IMU',IMU);
+[As, Bs] = motion_model_simple(dt, rov_sim);
 rov_est = rov_sim;
 rov_est.W = 2*rov_sim.W;
 rov_est.L = 3*rov_sim.L;
+[Ae, Be] = motion_model_simple(dt, rov_est);
 waypoints = [  0,  1,   2,   4,   6,   8,  10,  12,  14;
               -2, -2,  -1,  -3,  -1,  -3,  -1,  -3,  -1;
                1,  1, 1.5, 0.5,   2, 2.5,   2,   2,   2;];
+% waypoints = [  0, 14;
+%               -2, -1;
+%                1,  2;];
+
 way_idx = 1;
 cont_way_idx = 1;
 for k = 1:length(t)-1
@@ -90,54 +97,34 @@ for k = 1:length(t)-1
 %% Simulation
     
     % Simulated Motion Model Update
-    x(:,k+1) = motion_model(x(:,k),u(:,k),dt,rov_sim,true);
+    x(:,k+1) = motion_model2(x(:,k),u(:,k),dt,rov_sim,true);
     % Simulated IMU Sensor
-    y_IMU(:,k+1) = IMU_model(x(:,k+1), x(:,k), dt, rov_sim);
+%     y_IMU(:,k+1) = IMU_model(x(:,k+1), x(:,k), dt, rov_sim);
     
     
 %% EKF Estimation
-    mu_p = motion_model(mu(:,k),u(:,k),dt,rov_sim,false);
-    
-    
-    % Linearize Motion Model about mu
-    delta = 0.001;
-    Gx = zeros(12, 12);
-    H_IMU = zeros(9, 12);
-    Gu = zeros(12, 5);
-    ui_bar = zeros(5, 1);
-    f_bar = motion_model(mu(:,k),ui_bar,dt,rov_est,false);
-    states_i = 1:12;
-    for i = 1:length(states_i)
-        dmu = zeros(12, 1); dmu(states_i(i)) = delta;
-        df_dmu = -(f_bar-motion_model(mu(:,k)+dmu,ui_bar,dt,rov_est,false))/delta;
-        df_dmu([4:6, 10:12]) = wrapToPi(df_dmu([4:6, 10:12]));
-        Gx(:, i) = df_dmu(states_i);
-    end
-    motors_i = 1:5;
-    for i = 1:length(motors_i)
-        du = zeros(5, 1); du(motors_i(i)) = delta;
-        df_du = -(f_bar-motion_model(mu(:,k),ui_bar+du,dt,rov_est,false))/delta;
-        df_du([4:6, 10:12]) = wrapToPi(df_du([4:6, 10:12]));
-        Gu(:, i) = df_du(states_i);
-    end
-    y_bar = IMU_model_simple(mu_p, mu(:,k), dt, declination);
-    measurements = 1:9;
-    observable_states = [4,5,6];
-    for i = 1:length(observable_states)
-        dmu = zeros(12, 1); dmu(observable_states(i)) = delta;
-        dy_dmu = -(y_bar-IMU_model_simple(mu_p+dmu, mu(:,k), dt, declination))/delta;
-        H_IMU(:, observable_states(i)) = dy_dmu(measurements);
-    end
-    
-    cov_p = Gx*cov(:,:,k)*Gx' + Q;
-    
-    Kt = cov_p*H_IMU'/(H_IMU*cov_p*H_IMU'+R_IMU);
-    y_IMU_p = IMU_model_simple(mu_p, mu(:,k), dt, declination);
-    I = (y_IMU(:,k+1) - y_IMU_p);
-    mu(:,k+1) = mu_p + Kt*I;
-    cov(:,:,k+1) = (eye(12)-Kt*H_IMU)*cov_p;
-%     mu(:,k+1) = mu_p;
-%     cov(:,:,k+1) = cov_p;
+%     mu_p = motion_model(mu(:,k),u(:,k),dt,rov_sim,false);
+%     
+%     
+%     % Linearize Sensor Model about mu
+%     delta = 0.0001;
+%     H_IMU = zeros(9, 12);
+%     y_bar = IMU_model_simple(mu_p, mu(:,k), dt, declination);
+%     measurements = 1:9;
+%     observable_states = [4,5,6];
+%     for i = 1:length(observable_states)
+%         dmu = zeros(12, 1); dmu(observable_states(i)) = delta;
+%         dy_dmu = -(y_bar-IMU_model_simple(mu_p+dmu, mu(:,k), dt, declination))/delta;
+%         H_IMU(:, observable_states(i)) = dy_dmu(measurements);
+%     end
+%     
+%     cov_p = Ai*cov(:,:,k)*Ai' + Q;
+%     
+%     Kt = cov_p*H_IMU'/(H_IMU*cov_p*H_IMU'+R_IMU);
+%     y_IMU_p = IMU_model_simple(mu_p, mu(:,k), dt, declination);
+%     I = (y_IMU(:,k+1) - y_IMU_p);
+%     mu(:,k+1) = mu_p + Kt*I;
+%     cov(:,:,k+1) = (eye(12)-Kt*H_IMU)*cov_p;
 
 %% Outer Loop Non Linear Steering Controller
     K_STEER = 10;
@@ -153,12 +140,10 @@ for k = 1:length(t)-1
     
     prev_point = waypoints(1:2, cont_way_idx)';
     next_point = waypoints(1:2, cont_way_idx+1)';
-    curr_point = mu(1:2, k)';
+    curr_point = x(1:2, k)';
     [e_ct, cont_completion] = distanceToLineSegment(prev_point, next_point, curr_point);
     traj_angle = atan2(next_point(2)-prev_point(2), next_point(1)-prev_point(1));
-    e_h = wrapToPi(mu(6, k) - traj_angle);
-    
-
+    e_h = wrapToPi(x(6, k) - traj_angle);
     
     steer = wrapToPi(e_h/2 + atan2(K_STEER*e_ct, K_SOFT-tar_vel));
     
@@ -179,22 +164,19 @@ for k = 1:length(t)-1
 
     % Select rows and columns of G for inner LQR
     states_i = [3 4 5 6 9 10 11 12];
-    Ai = Gx(states_i, states_i);
-    Bi = Gu(states_i,:);
     % Weights
-    Qi = diag([1 1 1 100 0.1 0.1 0.1 0.001]);
+    Qi = diag([1 100 100 100 0.1 1 1 1]);
     Ri = diag([0.01 0.01 0.1 0.1 0.1]);
-    Kinner = dlqr(Ai,Bi,Qi,Ri);
+    Kinner = dlqr(Ae,Be,Qi,Ri);
     
     % Determine Inputs
-    dmu = x_bar-mu(:,k);
+    dmu = x_bar-x(:,k);
     dmu([4:6, 10:12]) = wrapToPi(dmu([4:6, 10:12]));
     dmu = dmu(states_i);
-    cur_vel = norm(mu(7:8,k));
-    u(motors_i, k+1) = Kinner*(dmu);
+    cur_vel = norm(x(7:8,k));
+    u(:, k+1) = Kinner*(dmu);
     u(1:2,k+1) = u(1:2,k+1) - mean(u(1:2,k+1)) + K_VEL*(tar_vel-cur_vel);
 
-    
     %% Update Waypoint
     if (cont_completion > 1 && cont_way_idx ~= length(waypoints))
         cont_way_idx = cont_way_idx + 1;
@@ -207,7 +189,7 @@ for k = 1:length(t)-1
     end
 
 %% Plot
-    if (mod(k, 10) == 0)
+    if (mod(k, 100) == 0)
         % Inertial Frame to Body Frame
         R = R3D(x(6,k), x(5,k), x(4,k));
 
