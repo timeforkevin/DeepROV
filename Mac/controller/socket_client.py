@@ -47,15 +47,11 @@ if __name__ == '__main__':
     xboxCont.setupControlCallback(xboxCont.XboxControls.RTHUMBX, right_thumb_x)
     xboxCont.setupControlCallback(xboxCont.XboxControls.RTHUMBY, right_thumb_y)
 
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host = sys.argv[1]
     port = int(sys.argv[2])
-    server_address = (host, port)
-    print("Starting socket server {}:{}".format(host, port))
-    server.bind(server_address)
-    server.listen(1)
-    conn, addr = server.accept()
+    print("Connecting to server:{}:{}".format(host, port))
+    client_socket.connect((host, port))
 
 
     try:
@@ -69,8 +65,8 @@ if __name__ == '__main__':
                 else:
                     output += str(idx) + str(int(motor)) + ','
 
-            conn.sendall(output.encode())
-            time.sleep(0.25)
+            client_socket.sendall(output.encode())
+            time.sleep(0.2)
     #Ctrl C
     except KeyboardInterrupt:
         print("User cancelled")
