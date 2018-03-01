@@ -77,8 +77,8 @@ class XboxController(threading.Thread):
         LTHUMBY = 1
         RTHUMBX = 2
         RTHUMBY = 3
-        RTRIGGER = 4
-        LTRIGGER = 5
+        RTRIGGER = 5
+        LTRIGGER = 4
 
     #pygame constants for the buttons of the xbox controller
     class PyGameButtons():

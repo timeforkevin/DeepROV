@@ -3,77 +3,86 @@ import time
 from xbox_controller import XboxController
 import socket
 
+OFFSET = 1500
+MOTORS = [OFFSET] * 5
+
 def left_thumb_x(x):
     if (x > 0):
-        motors[0] = x + 1500
+        MOTORS[0] = x + OFFSET
     else:
-        motors[1] = abs(x) + 1500
+        MOTORS[1] = abs(x) + OFFSET
 
 def left_thumb_y(y):
-    val = y + 1500
-    motors[0] = val
-    motors[1] = val
+    val = y + OFFSET
+    MOTORS[0] = val
+    MOTORS[1] = val
 
 def right_thumb_x(x):
     if(x > 0):
-        motors[3] = x + 1500
+        MOTORS[3] = x + OFFSET
     else:
-        motors[2] = abs(x) + 1500
-
+        MOTORS[2] = abs(x) + OFFSET
 
 def right_thumb_y(y):
-    val1 = y + 1500
-    val2 = -y + 1500
+    val1 = y + OFFSET
+    val2 = -y + OFFSET
     if(y > 0):
-        motors[2] = val1
-        motors[3] = val1
-        motors[4] = val2
+        MOTORS[2] = val1
+        MOTORS[3] = val1
+        MOTORS[4] = val2
     else:
-        motors[2] = val2
-        motors[3] = val2
-        motors[4] = val1
+        MOTORS[2] = val2
+        MOTORS[3] = val2
+        MOTORS[4] = val1
+
+def right_trigger(val):
+    MOTORS[2] = MOTORS[3] = MOTORS[4] = val + OFFSET
+
+def left_trigger(val):
+    MOTORS[2] = MOTORS[3] = MOTORS[4] = -val + OFFSET
 
 
 
 if __name__ == '__main__':
 
-    motors = [1500] * 5
+    MOTORS = [OFFSET] * 5
 
 
-    xboxCont = XboxController(deadzone = 30, scale = 200, invertYAxis = True)
+    xboxCont = XboxController(deadzone = 30, scale = 300, invertYAxis = True)
 
     xboxCont.setupControlCallback(xboxCont.XboxControls.LTHUMBX, left_thumb_x)
     xboxCont.setupControlCallback(xboxCont.XboxControls.LTHUMBY, left_thumb_y)
     xboxCont.setupControlCallback(xboxCont.XboxControls.RTHUMBX, right_thumb_x)
     xboxCont.setupControlCallback(xboxCont.XboxControls.RTHUMBY, right_thumb_y)
+    xboxCont.setupControlCallback(xboxCont.XboxControls.RTRIGGER, right_trigger)
+    xboxCont.setupControlCallback(xboxCont.XboxControls.LTRIGGER, left_trigger)
 
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host = sys.argv[1]
     port = int(sys.argv[2])
-    print("Connecting to server:{}:{}".format(host, port))
+    print('Connecting to server:{}:{}'.format(host, port))
     client_socket.connect((host, port))
 
 
     try:
         xboxCont.start()
-        print("xbox controller running")
+        print('xbox controller running')
         while True:
             output = ''
-            for idx, motor in enumerate(motors, 1):
-                if idx == len(motors):
+            for idx, motor in enumerate(MOTORS, 1):
+                if idx == len(MOTORS):
                     output += str(idx) + str(int(motor))
                 else:
                     output += str(idx) + str(int(motor)) + ','
-
             client_socket.sendall(output.encode())
             time.sleep(0.2)
     #Ctrl C
     except KeyboardInterrupt:
-        print("User cancelled")
+        print('User cancelled')
 
     #error
     except:
-        print("Unexpected error:", sys.exc_info()[0])
+        print('Unexpected error:', sys.exc_info()[0])
         raise
 
     finally:
