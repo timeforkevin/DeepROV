@@ -20,8 +20,10 @@ def left_thumb_y(y):
 def right_thumb_x(x):
     if(x > 0):
         MOTORS[3] = x + OFFSET
+        MOTORS[2] = -x + OFFSET
     else:
         MOTORS[2] = abs(x) + OFFSET
+        MOTORS[3] = x + OFFSET
 
 def right_thumb_y(y):
     val1 = y + OFFSET
@@ -31,9 +33,9 @@ def right_thumb_y(y):
         MOTORS[3] = val1
         MOTORS[4] = val2
     else:
-        MOTORS[2] = val2
-        MOTORS[3] = val2
-        MOTORS[4] = val1
+        MOTORS[2] = val1
+        MOTORS[3] = val1
+        MOTORS[4] = val2
 
 def right_trigger(val):
     MOTORS[2] = MOTORS[3] = MOTORS[4] = val + OFFSET
@@ -44,10 +46,6 @@ def left_trigger(val):
 
 
 if __name__ == '__main__':
-
-    MOTORS = [OFFSET] * 5
-
-
     xboxCont = XboxController(deadzone = 30, scale = 300, invertYAxis = True)
 
     xboxCont.setupControlCallback(xboxCont.XboxControls.LTHUMBX, left_thumb_x)
@@ -71,20 +69,19 @@ if __name__ == '__main__':
             output = ''
             for idx, motor in enumerate(MOTORS, 1):
                 if idx == len(MOTORS):
-                    output += str(idx) + str(int(motor))
+                    output += str(idx) + str(int(motor)) + '\n'
                 else:
                     output += str(idx) + str(int(motor)) + ','
+            print(output)
             client_socket.sendall(output.encode())
             time.sleep(0.2)
-    #Ctrl C
+
     except KeyboardInterrupt:
         print('User cancelled')
 
-    #error
     except:
         print('Unexpected error:', sys.exc_info()[0])
         raise
 
     finally:
-        #stop the controller
         xboxCont.stop()
