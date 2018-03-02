@@ -39,7 +39,7 @@ void printPWMs() {
 void setup() {
   Serial.begin(115200);
   Serial.setTimeout(20);
-  init_motor_pwms();
+  init_motors();
   init_leak_detector();
 }
 
