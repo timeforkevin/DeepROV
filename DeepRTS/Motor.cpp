@@ -60,9 +60,16 @@ void init_LUT() {
 
 void set_motors() {
   for (int i = 0; i < NUM_MOTORS; i++) {
-    int power_sat = MAX(MIN(motor_power,POWER_MAX),POWER_MIN);
+    int power_sat = MAX(MIN(motor_power[i],POWER_MAX),POWER_MIN);
     unsigned int lut_idx = power_sat - POWER_MIN + 1;
-    motor[i].writeMicroseconds(motor_LUT[i][lut_idx]);
+    motors[i].writeMicroseconds(motor_LUT[i][lut_idx]);
+  }
+}
+
+void set_motors_raw(long *pwms) {
+  if(sizeof(pwms)/sizeof(long) != NUM_MOTORS) return
+  for(int i = 0; i < NUM_MOTORS; i++) {
+    motors[i].writeMicroseconds(pwms[i]);
   }
 }
 

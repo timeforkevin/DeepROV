@@ -14,6 +14,7 @@ extern int motor_power[NUM_MOTORS];
 
 void init_motors();
 void set_motors();
+void set_motors_raw(long *pwms);
 
 // typedef enum MOTORS {
 //   T100,
