@@ -1,4 +1,5 @@
 #include "Motor.h"
+#include "LeakDetector.h"
 
 #define NUM_MOTORS 5
 long motor_pwms[5] = {1500, 1500, 1500, 1500};
@@ -39,12 +40,18 @@ void setup() {
   Serial.begin(115200);
   Serial.setTimeout(20);
   init_motor_pwms();
+  init_leak_detector();
 }
 
 void loop() {
-  while(Serial.available() > 0) {
-    parseInput(Serial.readString());
-    printPWMs();
-    set_motor_pwms_raw(motor_pwms);
+  if(leaky()) {
+    // Took the L
+  } else {
+    while(Serial.available() > 0) {
+      parseInput(Serial.readString());
+      printPWMs();
+      set_motor_pwms_raw(motor_pwms);
+    }
   }
+
 }

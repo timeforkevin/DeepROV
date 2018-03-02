@@ -16,6 +16,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   if (leaky()) {
     // Do the squeaky
+    // Can't take this L
   }
   motor_power[0] = 10;
   set_motors();
