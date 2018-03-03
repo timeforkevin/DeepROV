@@ -1,7 +1,9 @@
 
 #include "Motor.h"
-#include "Sonar.cpp"
+#include "Sonar.h"
 #include "LeakDetector.h"
+
+
 #include "IMU.h"
 
 void setup() {
@@ -9,7 +11,8 @@ void setup() {
   init_motors();
   init_sonars();
   init_leak_detector();
-  init_IMU();
+  init_MPU9250();
+  init_LSM9DS0();
 }
 
 void loop() {

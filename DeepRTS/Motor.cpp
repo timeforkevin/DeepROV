@@ -1,4 +1,3 @@
-
 #include "Arduino.h"
 #include "Servo.h"
 #include "Motor.h"
@@ -50,7 +49,7 @@ const unsigned int BFMLUT[POWER_MAX-POWER_MIN+1] = {
 
 const unsigned int motor_pins[NUM_MOTORS] = {5, 6, 9, 10, 11};
 Servo motors[NUM_MOTORS];
-unsigned int *motor_LUT[NUM_MOTORS];
+const unsigned int *motor_LUT[NUM_MOTORS];
 int motor_power[NUM_MOTORS];
 
 // TODO: Maybe needed for BFM
@@ -67,7 +66,7 @@ void set_motors() {
 }
 
 void set_motors_raw(long *pwms) {
-  if(sizeof(pwms)/sizeof(long) != NUM_MOTORS) return
+  if(sizeof(pwms)/sizeof(long) != NUM_MOTORS) return;
   for(int i = 0; i < NUM_MOTORS; i++) {
     motors[i].writeMicroseconds(pwms[i]);
   }

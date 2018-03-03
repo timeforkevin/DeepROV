@@ -9,7 +9,7 @@
 #define _MPU9250_H_
 
 #include <SPI.h>
-#include <Wire.h>
+#include "Wire.h"
 
 // See also MPU-9250 Register Map and Descriptions, Revision 4.0,
 // RM-MPU-9250A-00, Rev. 1.4, 9/9/2013 for registers not listed in above
@@ -214,7 +214,6 @@ class MPU9250
 
   public:
     float pitch, yaw, roll;
-    float temperature;   // Stores the real internal chip temperature in Celsius
     int16_t tempCount;   // Temperature raw count output
     uint32_t delt_t = 0; // Used to control display output rate
 
@@ -223,19 +222,26 @@ class MPU9250
     uint32_t lastUpdate = 0, firstUpdate = 0; // used to calculate integration interval
     uint32_t Now = 0;        // used to calculate integration interval
 
+    int16_t accelCount[3];  // Stores the 16-bit signed accelerometer sensor output
     int16_t gyroCount[3];   // Stores the 16-bit signed gyro sensor output
     int16_t magCount[3];    // Stores the 16-bit signed magnetometer sensor output
     // Scale resolutions per LSB for the sensors
     float aRes, gRes, mRes;
+    float magCalibration[3] = {0, 0, 0};
+    float magbias[3] = {0, 0, 0};
     // Variables to hold latest sensor data values
-    float ax, ay, az, gx, gy, gz, mx, my, mz;
+    float ax, ay, az;
+    float gx, gy, gz;
+    float mx, my, mz;
+    float temperature;   // Stores the real internal chip temperature in Celsius
+    float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};    // vector to hold quaternion
+    float eInt[3] = {0.0f, 0.0f, 0.0f};       // vector to hold integral error for Mahony method
+
     // Factory mag calibration and mag bias
-    float magCalibration[3] = {0, 0, 0}, magbias[3] = {0, 0, 0};
     // Bias corrections for gyro and accelerometer
     float gyroBias[3] = {0, 0, 0}, accelBias[3] = {0, 0, 0};
     float SelfTest[6];
-    // Stores the 16-bit signed accelerometer sensor output
-    int16_t accelCount[3];
+    
     
   public:
     void getMres();
