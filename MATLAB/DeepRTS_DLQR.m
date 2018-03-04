@@ -28,22 +28,22 @@ cyy = 100;
 czz = 100;
 
 % States: Z [in], Roll [rad], Pitch [rad], Yaw [rad]
-% 
-% Ad = diag([1 1 1 1]);
-% Bd = zeros(4, 5);
-% 
-% Bd(1,[3,4,5]) = T100_THRUST/M*dt*dt;
-% Bd(2,3) =      -T100_THRUST*W2/Jxx*dt*dt;
-% Bd(2,5) =       T100_THRUST*W2/Jxx*dt*dt;
-% Bd(3,[3,5]) =  -T100_THRUST*L1/Jyy*dt*dt;
-% Bd(3,4) =       T100_THRUST*L2/Jyy*dt*dt;
-% Bd(4,1) =      -T100_THRUST*W1/Jzz*dt*dt;
-% Bd(4,2) =       T100_THRUST*W1/Jzz*dt*dt;
-% 
-% Qd = diag([1 100 1 1]);
-% Rd = diag([10 10 1 1 1]);
-% 
-% Kd = dlqr(Ad,Bd,Qd,Rd);
+
+Ad = diag([1 1 1 1]);
+Bd = zeros(4, 5);
+
+Bd(1,[3,4,5]) = T100_THRUST/M*dt*dt;
+Bd(2,3) =      -T100_THRUST*W2/Jxx*dt*dt;
+Bd(2,5) =       T100_THRUST*W2/Jxx*dt*dt;
+Bd(3,[3,5]) =  -T100_THRUST*L1/Jyy*dt*dt;
+Bd(3,4) =       T100_THRUST*L2/Jyy*dt*dt;
+Bd(4,1) =      -T100_THRUST*W1/Jzz*dt*dt;
+Bd(4,2) =       T100_THRUST*W1/Jzz*dt*dt;
+
+Qd = diag([1 1 1 1]);
+Rd = diag([10 10 10 10 10]);
+
+Kd = dlqr(Ad,Bd,Qd,Rd);
 
 
 A = diag([1 1 1 1 1 1 1 1]);
@@ -62,8 +62,7 @@ B(7,4) =       T100_THRUST*L2/Jyy*dt*dt;
 B(8,1) =      -T100_THRUST*W1/Jzz*dt*dt;
 B(8,2) =       T100_THRUST*W1/Jzz*dt*dt;
 
-C = zeros(4,8);
-C(1:4,1:4) = diag([1 1 1 1]);
+C = diag([1 1 1 1]);
 
 Q = diag([1 1 1 1 1 10 10 0.01]);
 R = diag([10 10 10 10 10]);
@@ -74,8 +73,8 @@ t = 0:dt:100;
 u = zeros(5, length(t));
 x = zeros(8, length(t));
 y = zeros(4, length(t));
-mu = zeros(8, length(t));
-cov = zeros(8, 8, length(t));
+mu = zeros(4, length(t));
+cov = zeros(4, 4, length(t));
 
 % Covariance
 Q = diag([0.1, 0.008, 0.008, 0.008,...
@@ -83,12 +82,12 @@ Q = diag([0.1, 0.008, 0.008, 0.008,...
 [REx, Rex] = eig(Q);
 R = diag([1, 0.008, 0.008, 0.008].^2);
 [REy, Rey] = eig(R);
-Q_est = 4*Q;
+Q_est = 4*diag([0.1, 0.008, 0.008, 0.008].^2);
 R_est = 2*R;
 
 
 x(:,1) = [0; 0; 0; 0; 0; 0; 0; 0;];
-mu_tar  = [0; 0; 0; 0; 0; 0; 0; 0;];
+mu_tar  = [0; 0; 0; 0;];
 u_min = [-1;-1;-1;-1;-1;];
 u_max = [ 1; 1; 1; 1; 1;];
 
@@ -96,7 +95,7 @@ for k = 1:length(t)-1
     Ex = REx*sqrt(Rex)*randn(8,1);
     x(:,k+1) = A*x(:,k) + B*u(:,k) + Ex;
     Ey = REy*sqrt(Rey)*randn(4,1);
-    y(:,k) = C*x(:,k) + Ey;
+    y(:,k) = C*x(1:4,k) + Ey;
     
     % Estimation
     [mu_next, cov_next] = kalman_filter(mu(:,k), cov(:,:,k), y(:,k), C, Q_est, R_est);
@@ -104,8 +103,9 @@ for k = 1:length(t)-1
     cov(:,:,k+1) = cov_next;
     
     mu_tar(1) = mu(1,k+1);
-    dx = mu_tar - mu(:,k+1);
-    u(:,k+1) = K*dx;
+    dmu = mu_tar - mu(:,k+1);
+%     u(:,k+1) = K*dmu;
+    u(:,k+1) = Kd*dmu;
     u(:,k+1) = round(u(:,k+1),2);
     u(:,k+1) = max(u_min,min(u_max,u(:,k+1)));
 end
@@ -113,6 +113,7 @@ end
 figure(1)
 subplot(2, 1, 1)
 plot(t,x(1,:)/12,t,x(2:4,:),t,x(5,:)/12,t,x(6:8,:))
+% plot(t,mu(1,:)/12,t,mu(2:4,:),t,mu(5,:)/12,t,mu(6:8,:))
 ylim([-pi/2 pi/2]);
 legend('z', 'r', 'p', 'y', 'zd', 'rd', 'pd', 'yd');
 subplot(2, 1, 2)

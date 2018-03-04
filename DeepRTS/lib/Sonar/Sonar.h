@@ -8,6 +8,6 @@
 extern float sonar_outputs[NUM_SONAR];
 
 void init_sonars();
-void measure_sonars();
+void measure_sonars(double y[]);
 
 #endif

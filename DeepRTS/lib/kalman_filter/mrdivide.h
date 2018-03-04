@@ -20,7 +20,7 @@
 #include "kalman_filter_types.h"
 
 /* Function Declarations */
-extern void mrdivide(double A[32], const double B[16]);
+extern void mrdivide(double A[16], const double B[16]);
 
 #endif
 

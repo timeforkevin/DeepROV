@@ -3,11 +3,14 @@
 #include "Sonar.h"
 #include "LeakDetector.h"
 #include "IMU.h"
+#include "Controller.h"
 
 /* MATLAB Generated Kalman Filter code*/
 #include "kalman_filter.h"
 #include "kalman_filter_terminate.h"
 #include "kalman_filter_initialize.h"
+
+ControlMode mode = FullState;
 
 void setup() {
   init_motors();
@@ -15,6 +18,7 @@ void setup() {
   init_leak_detector();
   // init_MPU9250();
   init_LSM9DS0();
+  kalman_filter_initialize();
 }
 
 void loop() {
@@ -24,19 +28,16 @@ void loop() {
     // Can't take this L
   }
 
-  // Measurements
-  measure_sonars();   // How often can we ping?
-  measure_LSM9DS0();
+  // Measurement Vector
+  measure_sonars(y);   // How often can we ping?
+  measure_LSM9DS0(y);
 
   // Calculate State Vector
-  float dt = IMU_LSM9DS0.deltat;
-  float x[4] = {sonar_outputs[0]*cos(IMU_LSM9DS0.pitch)*cos(IMU_LSM9DS0.roll), 
-                IMU_LSM9DS0.roll,
-                IMU_LSM9DS0.pitch,
-                IMU_LSM9DS0.yaw};
+  kalman_filter(mu, cov, y, C, Q_est, R_est,
+                mu, cov);
 
   // Calculate Control Outputs
-
+  dlqr(mode, mu, motor_power);
 
   // Execute Control Outputs
   set_motors();

@@ -15,7 +15,7 @@ void init_sonars() {
   }
 }
 
-void measure_sonars() {
+void measure_sonars(double y[]) {
   for (int i = 0; i < NUM_SONAR; i++) {
     
     digitalWrite(trig_pins[i], LOW);
@@ -30,4 +30,5 @@ void measure_sonars() {
     sonar_outputs[i] = float(us) * SPEED_OF_SOUND * 1E-6;
     delay(50);
   }
+  y[0] = sonar_outputs[0];
 }

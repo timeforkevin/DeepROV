@@ -59,7 +59,7 @@ void init_MPU9250() {
   }
 }
 
-void measure_MPU9520() {
+void measure_MPU9520(double y[]) {
   IMU_MPU9520.readAccelData(IMU_MPU9520.accelCount);  // Read the x/y/z adc values
   IMU_MPU9520.getAres();
 
@@ -129,6 +129,9 @@ void measure_MPU9520() {
   IMU_MPU9520.yaw   = atan2(2.0f * (IMU_MPU9520.q[1] * IMU_MPU9520.q[2] + IMU_MPU9520.q[0] * IMU_MPU9520.q[3]), 1 - 2.0f * (IMU_MPU9520.q[2]*IMU_MPU9520.q[2] + IMU_MPU9520.q[3]*IMU_MPU9520.q[3]));
   IMU_MPU9520.pitch = asin(2.0f * (IMU_MPU9520.q[0] * IMU_MPU9520.q[2] - IMU_MPU9520.q[1] * IMU_MPU9520.q[3]));
   IMU_MPU9520.roll  = atan2(2.0f * (IMU_MPU9520.q[0] * IMU_MPU9520.q[1] + IMU_MPU9520.q[2] * IMU_MPU9520.q[3]), 1 - 2.0f * (IMU_MPU9520.q[1]*IMU_MPU9520.q[1] + IMU_MPU9520.q[2]*IMU_MPU9520.q[2]));
+  y[1] = IMU_MPU9520.roll;
+  y[2] = IMU_MPU9520.pitch;
+  y[3] = IMU_MPU9520.yaw;
 }
 
 #endif
@@ -180,7 +183,7 @@ void init_LSM9DS0() {
     IMU_LSM9DS0.calLSM9DS0(IMU_LSM9DS0.gbias, IMU_LSM9DS0.abias);
 }
 
-void measure_LSM9DS0() {
+void measure_LSM9DS0(double y[]) {
   IMU_LSM9DS0.readGyro(IMU_LSM9DS0.gyroCount);           // Read raw gyro data
   IMU_LSM9DS0.gx = (float)IMU_LSM9DS0.gyroCount[0]*IMU_LSM9DS0.gRes - IMU_LSM9DS0.gbias[0];
   IMU_LSM9DS0.gy = (float)IMU_LSM9DS0.gyroCount[1]*IMU_LSM9DS0.gRes - IMU_LSM9DS0.gbias[1];
@@ -211,6 +214,9 @@ void measure_LSM9DS0() {
   IMU_LSM9DS0.yaw   = atan2(2.0f * (IMU_LSM9DS0.q[1] * IMU_LSM9DS0.q[2] + IMU_LSM9DS0.q[0] * IMU_LSM9DS0.q[3]), 1 - 2.0f * (IMU_LSM9DS0.q[2]*IMU_LSM9DS0.q[2] + IMU_LSM9DS0.q[3]*IMU_LSM9DS0.q[3]));
   IMU_LSM9DS0.pitch = asin(2.0f * (IMU_LSM9DS0.q[0] * IMU_LSM9DS0.q[2] - IMU_LSM9DS0.q[1] * IMU_LSM9DS0.q[3]));
   IMU_LSM9DS0.roll  = atan2(2.0f * (IMU_LSM9DS0.q[0] * IMU_LSM9DS0.q[1] + IMU_LSM9DS0.q[2] * IMU_LSM9DS0.q[3]), 1 - 2.0f * (IMU_LSM9DS0.q[1]*IMU_LSM9DS0.q[1] + IMU_LSM9DS0.q[2]*IMU_LSM9DS0.q[2]));
+  y[1] = IMU_LSM9DS0.roll;
+  y[2] = IMU_LSM9DS0.pitch;
+  y[3] = IMU_LSM9DS0.yaw;
 }
 
 #endif

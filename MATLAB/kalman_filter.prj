@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2016a">
-  <configuration build-checksum="2179378157" file="C:\Users\kevin\DeepROV\MATLAB\kalman_filter.prj" location="C:\Users\kevin\DeepROV\MATLAB" name="kalman_filter" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="472762004" file="C:\Users\kevin\DeepROV\MATLAB\kalman_filter.prj" location="C:\Users\kevin\DeepROV\MATLAB" name="kalman_filter" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -731,6 +731,11 @@
     <param.version>R2012a</param.version>
     <param.HasECoderFeatures>false</param.HasECoderFeatures>
     <param.HasGpuCoder>true</param.HasGpuCoder>
+    <param.newGlobals>
+      <Globals>
+        <idpTable />
+      </Globals>
+    </param.newGlobals>
     <param.mex.mainhtml />
     <param.grt.mainhtml />
     <param.CallGeneratedCodeFromTest>true</param.CallGeneratedCodeFromTest>
@@ -741,7 +746,7 @@
     <param.AutoInferUnboundedSizeThreshold>2048</param.AutoInferUnboundedSizeThreshold>
     <param.EnableFixedPointStep>false</param.EnableFixedPointStep>
     <param.EnableScreener>true</param.EnableScreener>
-    <param.AnnotationChecksum>3758150297</param.AnnotationChecksum>
+    <param.AnnotationChecksum>84203550</param.AnnotationChecksum>
     <var.LegacyTarget />
     <var.MirrorOnOpen>false</var.MirrorOnOpen>
     <param.FixedPointEnabled>false</param.FixedPointEnabled>
@@ -750,12 +755,12 @@
     <param.unifiedParamStorage />
     <var.gc.lastOutputRoot>codegen\lib\kalman_filter</var.gc.lastOutputRoot>
     <var.gc.lastOutputType>C_CODE</var.gc.lastOutputType>
-    <var.gc.preBuildChecksum>2179378157</var.gc.preBuildChecksum>
+    <var.gc.preBuildChecksum>3208559354</var.gc.preBuildChecksum>
     <var.cfi.lastOutputRoot>codegen\mex\kalman_filter</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>3278850346</var.cfi.preBuildChecksum>
+    <var.cfi.preBuildChecksum>659110414</var.cfi.preBuildChecksum>
     <var.lastCfiTestSnippet>DeepRTS_DLQR.m</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
-    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;C:\Users\kevin\DeepROV\MATLAB\kalman_filter.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;2333248392&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
+    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;C:\Users\kevin\DeepROV\MATLAB\kalman_filter.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;2536777976&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
     <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;C:\Users\kevin\DeepROV\MATLAB\kalman_filter.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
     <param.forceMexBuild>false</param.forceMexBuild>
     <param.configImportActive>false</param.configImportActive>
@@ -889,7 +894,7 @@
     </unset>
     <fileset.entrypoints>
       <file custom-data-expanded="false" value="${PROJECT_ROOT}\kalman_filter.m">
-        <Marker>1520145144876</Marker>
+        <Marker>1520194558598</Marker>
       </file>
     </fileset.entrypoints>
     <fileset.testbench>
@@ -900,28 +905,12 @@
         <Inputs fileName="kalman_filter.m" functionName="kalman_filter">
           <Input Name="mu" typeId="0" />
           <Input Name="cov" typeId="1" />
-          <Input Name="y" typeId="2" />
-          <Input Name="C" typeId="3" />
-          <Input Name="Q_est" typeId="4" />
-          <Input Name="R_est" typeId="5" />
+          <Input Name="y" typeId="0" />
+          <Input Name="C" typeId="1" />
+          <Input Name="Q_est" typeId="1" />
+          <Input Name="R_est" typeId="1" />
           <idpTable>
             <type typeId="0">
-              <Class>double</Class>
-              <Size>8 x 1</Size>
-              <Value />
-              <InitialValue />
-              <UserDefined>false</UserDefined>
-              <Complex>false</Complex>
-            </type>
-            <type typeId="1">
-              <Class>double</Class>
-              <Size>8 x 8</Size>
-              <Value />
-              <InitialValue />
-              <UserDefined>true</UserDefined>
-              <Complex>false</Complex>
-            </type>
-            <type typeId="2">
               <Class>double</Class>
               <Size>4 x 1</Size>
               <Value />
@@ -929,23 +918,7 @@
               <UserDefined>false</UserDefined>
               <Complex>false</Complex>
             </type>
-            <type typeId="3">
-              <Class>double</Class>
-              <Size>4 x 8</Size>
-              <Value />
-              <InitialValue />
-              <UserDefined>false</UserDefined>
-              <Complex>false</Complex>
-            </type>
-            <type typeId="4">
-              <Class>double</Class>
-              <Size>8 x 8</Size>
-              <Value />
-              <InitialValue />
-              <UserDefined>false</UserDefined>
-              <Complex>false</Complex>
-            </type>
-            <type typeId="5">
+            <type typeId="1">
               <Class>double</Class>
               <Size>4 x 4</Size>
               <Value />
