@@ -5,7 +5,7 @@
 #include "quaternionFilters.h"
 
 
-#define USE_MPU9520
+// #define USE_MPU9520
 #define USE_LSM9DS0
 
 
@@ -29,7 +29,5 @@ extern LSM9DS0 IMU_LSM9DS0;
 void init_LSM9DS0();
 void measure_LSM9DS0();
 #endif
-
-#define DEG_TO_RAD (M_PI/180.0f)
 
 #endif
