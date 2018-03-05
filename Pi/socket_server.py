@@ -21,7 +21,7 @@ if __name__ == '__main__':
         if data:
             data = data.decode()
             data = data.split('\n')[-2] + '\n'
-            print('Client Data= {}'.format(data))
+            # print('Client Data= {}'.format(data))
             arduino.write(data.encode())
             ard_input = arduino.readline().rstrip('\n')
             if ard_input:
