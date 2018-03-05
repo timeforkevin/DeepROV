@@ -21,6 +21,7 @@ T100_THRUST = 5;              % [lbf]
 g = 32.174;                   % [ft/s^2]
 T100_THRUST = T100_THRUST*g;  % [lb*ft/s^2]
 T100_THRUST = T100_THRUST*12; % [lb*in/s^2]
+pf = 1.85;
 
 cx = 100;
 cxx = 100;
@@ -87,6 +88,8 @@ R_est = 2*R;
 
 
 x(:,1) = [0; 0; 0; 0; 0; 0; 0; 0;];
+
+
 mu_tar  = [0; 0; 0; 0;];
 u_min = [-1;-1;-1;-1;-1;];
 u_max = [ 1; 1; 1; 1; 1;];
@@ -102,11 +105,17 @@ for k = 1:length(t)-1
     mu(:,k+1) = mu_next;
     cov(:,:,k+1) = cov_next;
     
-    mu_tar(1) = mu(1,k+1);
+    mu_tar(3) = mu(3,k+1)+0.01;
     dmu = mu_tar - mu(:,k+1);
 %     u(:,k+1) = K*dmu;
     u(:,k+1) = Kd*dmu;
     u(:,k+1) = round(u(:,k+1),2);
+    
+    if (u(4,k+1) > u_max(4) || u(4,k+1) < u_min(4))
+        u(3,k+1) = u(3,k+1)/abs(u(4,k+1));
+        u(5,k+1) = u(5,k+1)/abs(u(4,k+1));
+    end
+    u([3,5],k+1) = u([3,5],k+1)/pf;
     u(:,k+1) = max(u_min,min(u_max,u(:,k+1)));
 end
 
@@ -114,7 +123,7 @@ figure(1)
 subplot(2, 1, 1)
 plot(t,x(1,:)/12,t,x(2:4,:),t,x(5,:)/12,t,x(6:8,:))
 % plot(t,mu(1,:)/12,t,mu(2:4,:),t,mu(5,:)/12,t,mu(6:8,:))
-ylim([-pi/2 pi/2]);
+% ylim([-pi/2 pi/2]);
 legend('z', 'r', 'p', 'y', 'zd', 'rd', 'pd', 'yd');
 subplot(2, 1, 2)
 plot(t,u(:,:))

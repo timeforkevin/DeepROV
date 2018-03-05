@@ -10,7 +10,7 @@ MPU9250 IMU_MPU9520;
 void init_MPU9250() {
   Wire.begin();
   // TWBR = 12;  // 400 kbit/sec I2C speed
-  Serial.begin(38400);
+  Serial.begin(115200);
 
   // Set up the interrupt pin, its set as active high, push-pull
   pinMode(12, INPUT);
@@ -140,7 +140,7 @@ void measure_MPU9520(double y[]) {
 LSM9DS0 IMU_LSM9DS0(MODE_I2C, LSM9DS0_G, LSM9DS0_XM);
 
 void init_LSM9DS0() {
-  Serial.begin(38400); // Start serial at 38400 bps
+  Serial.begin(115200); // Start serial at 115200 bps
 
   // begin() returns a 16-bit value which includes both the gyro 
   // and accelerometers WHO_AM_I response. You can check this to
