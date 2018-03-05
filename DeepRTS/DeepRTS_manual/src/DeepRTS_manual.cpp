@@ -40,18 +40,26 @@ void setup() {
   Serial.begin(115200);
   Serial.setTimeout(20);
   init_motors();
-  init_leak_detector();
+  set_motors_raw(motor_pwms);
+  delay(2000);
+  // init_leak_detector();
 }
 
 void loop() {
-  if(leaky()) {
-    // Took the L
-  } else {
-    while(Serial.available() > 0) {
-      parseInput(Serial.readString());
-      printPWMs();
-      set_motor_pwms_raw(motor_pwms);
-    }
+  // if(leaky()) {
+  //   // Took the L
+  // } else {
+  //   while(Serial.available() > 0) {
+  //     parseInput(Serial.readString());
+  //     printPWMs();
+  //     set_motors_raw(motor_pwms);
+  //   }
+  // }
+
+  while(Serial.available() > 0) {
+    parseInput(Serial.readString());
+    printPWMs();
+    set_motors_raw(motor_pwms);
   }
 
 }
