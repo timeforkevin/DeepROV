@@ -36,7 +36,10 @@ class VideoCamera(object):
             'sofa',
             'train',
             'tvmonitor',
-            ]
+        ]
+        # rows = open('synset_words.txt').read().strip().split('\n')
+        # self.classes = [r[r.find(' ') + 1:].split(',')[0] for r in rows]
+        # print(self.classes)
         self.colors = np.random.uniform(0, 255,
                 size=(len(self.classes), 3))
         self.net = \
@@ -48,12 +51,19 @@ class VideoCamera(object):
         self.fps.stop()
         self.vs.stop()
 
+
     def get_frame(self):
         frame = self.vs.read()
-        frame = imutils.resize(frame, width=1280)
+        self.fps.update()
+        (ret, jpeg) = cv2.imencode('.jpg', frame)
+        return jpeg.tobytes()
+
+    def analyze_frame(self):
+        frame = self.vs.read()
+        frame = imutils.resize(frame, width=400)
 
         (h, w) = frame.shape[:2]
-        blob = cv2.dnn.blobFromImage(cv2.resize(frame, (1280, 1024)),
+        blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)),
                 0.007843, (300, 300), 127.5)
 
         self.net.setInput(blob)
