@@ -318,22 +318,31 @@ void LSM9DS0::calLSM9DS0(float * gbias, float * abias)
   xmWriteByte(FIFO_CTRL_REG, 0x00);       // Enable accelerometer bypass mode
 }
 
-void LSM9DS0::readAccel(int16_t * destination)
+void LSM9DS0::readAccel()
 {
+  calcaRes();
   uint8_t temp[6]; // We'll read six bytes from the accelerometer into temp 
   xmReadBytes(OUT_X_L_A, temp, 6); // Read 6 bytes, beginning at OUT_X_L_A
-  destination[0] = (temp[1] << 8) | temp[0]; // Store x-axis values
-  destination[1] = (temp[3] << 8) | temp[2]; // Store y-axis values
-  destination[2] = (temp[5] << 8) | temp[4]; // Store z-axis values
+  accelCount[0] = (temp[1] << 8) | temp[0]; // Store x-axis values
+  accelCount[1] = (temp[3] << 8) | temp[2]; // Store y-axis values
+  accelCount[2] = (temp[5] << 8) | temp[4]; // Store z-axis values
+  ax = (float)(accelCount[0])*aRes - abias[0];
+  ay = (float)(accelCount[1])*aRes - abias[1];
+  az = (float)(accelCount[2])*aRes - abias[2];
 }
 
-void LSM9DS0::readMag(int16_t * destination)
+void LSM9DS0::readMag()
 {
+  calcmRes();
   uint8_t temp[6]; // We'll read six bytes from the mag into temp 
   xmReadBytes(OUT_X_L_M, temp, 6); // Read 6 bytes, beginning at OUT_X_L_M
-  destination[0] = (temp[1] << 8) | temp[0]; // Store x-axis values
-  destination[1] = (temp[3] << 8) | temp[2]; // Store y-axis values
-  destination[2] = (temp[5] << 8) | temp[4]; // Store z-axis values
+  magCount[0] = (temp[1] << 8) | temp[0]; // Store x-axis values
+  magCount[1] = (temp[3] << 8) | temp[2]; // Store y-axis values
+  magCount[2] = (temp[5] << 8) | temp[4]; // Store z-axis values
+  mx = (float)(magCount[0])*mRes;     // Convert to Gauss and correct for calibration
+  my = (float)(magCount[1])*mRes;
+  mz = (float)(magCount[2])*mRes;
+
 }
 
 void LSM9DS0::readTemp()
@@ -343,13 +352,17 @@ void LSM9DS0::readTemp()
   temperature = (((int16_t) temp[1] << 12) | temp[0] << 4 ) >> 4; // Temperature is a 12-bit signed integer
 }
 
-void LSM9DS0::readGyro(int16_t * destination)
+void LSM9DS0::readGyro()
 {
+  calcgRes();
   uint8_t temp[6]; // We'll read six bytes from the gyro into temp
   gReadBytes(OUT_X_L_G, temp, 6); // Read 6 bytes, beginning at OUT_X_L_G
-  destination[0] = (temp[1] << 8) | temp[0]; // Store x-axis values
-  destination[1] = (temp[3] << 8) | temp[2]; // Store y-axis values
-  destination[2] = (temp[5] << 8) | temp[4]; // Store z-axis values
+  gyroCount[0] = (temp[1] << 8) | temp[0]; // Store x-axis values
+  gyroCount[1] = (temp[3] << 8) | temp[2]; // Store y-axis values
+  gyroCount[2] = (temp[5] << 8) | temp[4]; // Store z-axis values
+  gx = (float)(gyroCount[0])*gRes - gbias[0];
+  gy = (float)(gyroCount[1])*gRes - gbias[1];
+  gz = (float)(gyroCount[2])*gRes - gbias[2];
 }
 
 void LSM9DS0::updateTime()

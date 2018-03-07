@@ -14,7 +14,7 @@
 #include "mrdivide.h"
 
 /* Function Definitions */
-void mrdivide(double A[16], const double B[16])
+void mrdivide(double A[32], const double B[16])
 {
   double b_A[16];
   int k;
@@ -86,30 +86,30 @@ void mrdivide(double A[16], const double B[16])
   }
 
   for (j = 0; j < 4; j++) {
-    jp = j << 2;
+    jp = j << 3;
     jAcol = j << 2;
     for (k = 1; k <= j; k++) {
-      kBcol = (k - 1) << 2;
+      kBcol = (k - 1) << 3;
       if (b_A[(k + jAcol) - 1] != 0.0) {
-        for (i = 0; i < 4; i++) {
+        for (i = 0; i < 8; i++) {
           A[i + jp] -= b_A[(k + jAcol) - 1] * A[i + kBcol];
         }
       }
     }
 
     temp = 1.0 / b_A[j + jAcol];
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 8; i++) {
       A[i + jp] *= temp;
     }
   }
 
   for (j = 3; j >= 0; j += -1) {
-    jp = j << 2;
+    jp = j << 3;
     jAcol = (j << 2) - 1;
     for (k = j + 2; k < 5; k++) {
-      kBcol = (k - 1) << 2;
+      kBcol = (k - 1) << 3;
       if (b_A[k + jAcol] != 0.0) {
-        for (i = 0; i < 4; i++) {
+        for (i = 0; i < 8; i++) {
           A[i + jp] -= b_A[k + jAcol] * A[i + kBcol];
         }
       }
@@ -119,10 +119,10 @@ void mrdivide(double A[16], const double B[16])
   for (kBcol = 2; kBcol >= 0; kBcol += -1) {
     if (ipiv[kBcol] != kBcol + 1) {
       jp = ipiv[kBcol] - 1;
-      for (jAcol = 0; jAcol < 4; jAcol++) {
-        temp = A[jAcol + (kBcol << 2)];
-        A[jAcol + (kBcol << 2)] = A[jAcol + (jp << 2)];
-        A[jAcol + (jp << 2)] = temp;
+      for (jAcol = 0; jAcol < 8; jAcol++) {
+        temp = A[jAcol + (kBcol << 3)];
+        A[jAcol + (kBcol << 3)] = A[jAcol + (jp << 3)];
+        A[jAcol + (jp << 3)] = temp;
       }
     }
   }

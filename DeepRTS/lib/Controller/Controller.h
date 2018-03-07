@@ -5,22 +5,28 @@
 #include "kalman_filter_initialize.h"
 #include "Motor.h"
 
+#define MANUAL_STATES 4
+
 typedef enum ControlMode {
-  FullState   = 0x00,
-  ManualZ     = 0x01,
-  ManualRoll  = 0x02,
-  ManualPitch = 0x04,
-  ManualYaw   = 0x08
+  FullState    = 0x00,
+  ManZVel      = 0x01,
+  ManRollTrim  = 0x02,
+  ManPitchTrim = 0x04,
+  ManYawVel    = 0x08,
+  ManXVel      = 0x10
 } ControlMode;
 
 extern double KLQR[NUM_MOTORS*NUM_STATES];
 extern double target[NUM_STATES];
-extern double manual[NUM_STATES];
-extern int    target_vel;
+
+extern long   man_x_vel;
+extern double man_z_vel;
+extern double man_y_vel;
+extern long   man_r_trim;
+extern long   man_p_trim;
 extern double pitch_factor;
 extern unsigned int dlqr_mode;
 
-void dlqr(const double mu[NUM_STATES],
-          int u[NUM_MOTORS]);
-void vel_control(int u[NUM_MOTORS]);
+void controller(const double mu[NUM_STATES],
+                int u[NUM_MOTORS]);
 #endif

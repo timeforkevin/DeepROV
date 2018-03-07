@@ -15,10 +15,10 @@
 
 /*=======================================================================*
  * Target hardware information
- *   Device type: Atmel->AVR (8-bit)
- *   Number of bits:     char:   8    short:   16    int:  16
+ *   Device type: Atmel->AVR (32-bit)
+ *   Number of bits:     char:   8    short:   16    int:  32
  *                       long:  32
- *                       native word size:  16
+ *                       native word size:  32
  *   Byte ordering: LittleEndian
  *   Signed integer division rounds to: Zero
  *   Shift right on a signed integer as arithmetic shift: on
@@ -32,10 +32,10 @@
  *=======================================================================*/
 typedef signed char int8_T;
 typedef unsigned char uint8_T;
-typedef int int16_T;
-typedef unsigned int uint16_T;
-typedef long int32_T;
-typedef unsigned long uint32_T;
+typedef short int16_T;
+typedef unsigned short uint16_T;
+typedef int int32_T;
+typedef unsigned int uint32_T;
 typedef float real32_T;
 typedef double real64_T;
 

@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2016a">
-  <configuration build-checksum="472762004" file="C:\Users\kevin\DeepROV\MATLAB\kalman_filter.prj" location="C:\Users\kevin\DeepROV\MATLAB" name="kalman_filter" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="1359116223" file="C:\Users\kevin\DeepROV\MATLAB\kalman_filter.prj" location="C:\Users\kevin\DeepROV\MATLAB" name="kalman_filter" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -184,20 +184,20 @@
       <param.target.ActiveType>option.target.TargetType.Custom</param.target.ActiveType>
       <param.target.ActiveTarget />
       <param.HardwareVendor.Production>Atmel</param.HardwareVendor.Production>
-      <param.HardwareType.Production>AVR (8-bit)</param.HardwareType.Production>
+      <param.HardwareType.Production>AVR (32-bit)</param.HardwareType.Production>
       <param.HWDeviceType.Production />
       <var.instance.enabled.Production>true</var.instance.enabled.Production>
       <param.HardwareSizeChar.Production>8</param.HardwareSizeChar.Production>
       <param.HardwareSizeShort.Production>16</param.HardwareSizeShort.Production>
-      <param.HardwareSizeInt.Production>16</param.HardwareSizeInt.Production>
+      <param.HardwareSizeInt.Production>32</param.HardwareSizeInt.Production>
       <param.HardwareSizeLong.Production>32</param.HardwareSizeLong.Production>
       <param.HardwareSizeLongLong.Production>64</param.HardwareSizeLongLong.Production>
       <param.HardwareSizeFloat.Production>32</param.HardwareSizeFloat.Production>
       <param.HardwareSizeDouble.Production>64</param.HardwareSizeDouble.Production>
-      <param.HardwareSizeWord.Production>16</param.HardwareSizeWord.Production>
-      <param.HardwareSizePointer.Production>16</param.HardwareSizePointer.Production>
-      <param.HardwareSizeSizeT.Production>16</param.HardwareSizeSizeT.Production>
-      <param.HardwareSizePtrDiffT.Production>16</param.HardwareSizePtrDiffT.Production>
+      <param.HardwareSizeWord.Production>32</param.HardwareSizeWord.Production>
+      <param.HardwareSizePointer.Production>32</param.HardwareSizePointer.Production>
+      <param.HardwareSizeSizeT.Production>32</param.HardwareSizeSizeT.Production>
+      <param.HardwareSizePtrDiffT.Production>32</param.HardwareSizePtrDiffT.Production>
       <param.HardwareEndianness.Production>option.HardwareEndianness.Little</param.HardwareEndianness.Production>
       <param.HardwareArithmeticRightShift.Production>true</param.HardwareArithmeticRightShift.Production>
       <param.HardwareLongLongMode.Production>false</param.HardwareLongLongMode.Production>
@@ -205,20 +205,20 @@
       <param.HardwareAtomicFloatSize.Production>option.HardwareAtomicFloatSize.None</param.HardwareAtomicFloatSize.Production>
       <param.HardwareDivisionRounding.Production>option.HardwareDivisionRounding.Zero</param.HardwareDivisionRounding.Production>
       <param.HardwareVendor.Target>Atmel</param.HardwareVendor.Target>
-      <param.HardwareType.Target>AVR (8-bit)</param.HardwareType.Target>
+      <param.HardwareType.Target>AVR (32-bit)</param.HardwareType.Target>
       <param.HWDeviceType.Target />
       <var.instance.enabled.Target>false</var.instance.enabled.Target>
       <param.HardwareSizeChar.Target>8</param.HardwareSizeChar.Target>
       <param.HardwareSizeShort.Target>16</param.HardwareSizeShort.Target>
-      <param.HardwareSizeInt.Target>16</param.HardwareSizeInt.Target>
+      <param.HardwareSizeInt.Target>32</param.HardwareSizeInt.Target>
       <param.HardwareSizeLong.Target>32</param.HardwareSizeLong.Target>
       <param.HardwareSizeLongLong.Target>64</param.HardwareSizeLongLong.Target>
       <param.HardwareSizeFloat.Target>32</param.HardwareSizeFloat.Target>
       <param.HardwareSizeDouble.Target>64</param.HardwareSizeDouble.Target>
-      <param.HardwareSizeWord.Target>16</param.HardwareSizeWord.Target>
-      <param.HardwareSizePointer.Target>16</param.HardwareSizePointer.Target>
-      <param.HardwareSizeSizeT.Target>16</param.HardwareSizeSizeT.Target>
-      <param.HardwareSizePtrDiffT.Target>16</param.HardwareSizePtrDiffT.Target>
+      <param.HardwareSizeWord.Target>32</param.HardwareSizeWord.Target>
+      <param.HardwareSizePointer.Target>32</param.HardwareSizePointer.Target>
+      <param.HardwareSizeSizeT.Target>32</param.HardwareSizeSizeT.Target>
+      <param.HardwareSizePtrDiffT.Target>32</param.HardwareSizePtrDiffT.Target>
       <param.HardwareEndianness.Target>option.HardwareEndianness.Little</param.HardwareEndianness.Target>
       <param.HardwareArithmeticRightShift.Target>true</param.HardwareArithmeticRightShift.Target>
       <param.HardwareLongLongMode.Target>false</param.HardwareLongLongMode.Target>
@@ -324,10 +324,15 @@
         <var.instance.enabled.Production />
         <param.HardwareSizeChar.Production />
         <param.HardwareSizeShort.Production />
+        <param.HardwareSizeInt.Production />
         <param.HardwareSizeLong.Production />
         <param.HardwareSizeLongLong.Production />
         <param.HardwareSizeFloat.Production />
         <param.HardwareSizeDouble.Production />
+        <param.HardwareSizeWord.Production />
+        <param.HardwareSizePointer.Production />
+        <param.HardwareSizeSizeT.Production />
+        <param.HardwareSizePtrDiffT.Production />
         <param.HardwareEndianness.Production />
         <param.HardwareLongLongMode.Production />
         <param.HardwareAtomicIntegerSize.Production />
@@ -336,10 +341,15 @@
         <var.instance.enabled.Target />
         <param.HardwareSizeChar.Target />
         <param.HardwareSizeShort.Target />
+        <param.HardwareSizeInt.Target />
         <param.HardwareSizeLong.Target />
         <param.HardwareSizeLongLong.Target />
         <param.HardwareSizeFloat.Target />
         <param.HardwareSizeDouble.Target />
+        <param.HardwareSizeWord.Target />
+        <param.HardwareSizePointer.Target />
+        <param.HardwareSizeSizeT.Target />
+        <param.HardwareSizePtrDiffT.Target />
         <param.HardwareEndianness.Target />
         <param.HardwareLongLongMode.Target />
         <param.HardwareAtomicIntegerSize.Target />
@@ -746,7 +756,7 @@
     <param.AutoInferUnboundedSizeThreshold>2048</param.AutoInferUnboundedSizeThreshold>
     <param.EnableFixedPointStep>false</param.EnableFixedPointStep>
     <param.EnableScreener>true</param.EnableScreener>
-    <param.AnnotationChecksum>84203550</param.AnnotationChecksum>
+    <param.AnnotationChecksum>1055070870</param.AnnotationChecksum>
     <var.LegacyTarget />
     <var.MirrorOnOpen>false</var.MirrorOnOpen>
     <param.FixedPointEnabled>false</param.FixedPointEnabled>
@@ -755,12 +765,12 @@
     <param.unifiedParamStorage />
     <var.gc.lastOutputRoot>codegen\lib\kalman_filter</var.gc.lastOutputRoot>
     <var.gc.lastOutputType>C_CODE</var.gc.lastOutputType>
-    <var.gc.preBuildChecksum>3208559354</var.gc.preBuildChecksum>
+    <var.gc.preBuildChecksum>2579403254</var.gc.preBuildChecksum>
     <var.cfi.lastOutputRoot>codegen\mex\kalman_filter</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>659110414</var.cfi.preBuildChecksum>
+    <var.cfi.preBuildChecksum>3360055582</var.cfi.preBuildChecksum>
     <var.lastCfiTestSnippet>DeepRTS_DLQR.m</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
-    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;C:\Users\kevin\DeepROV\MATLAB\kalman_filter.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;2536777976&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
+    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;C:\Users\kevin\DeepROV\MATLAB\kalman_filter.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;2137725496&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
     <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;C:\Users\kevin\DeepROV\MATLAB\kalman_filter.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
     <param.forceMexBuild>false</param.forceMexBuild>
     <param.configImportActive>false</param.configImportActive>
@@ -894,7 +904,7 @@
     </unset>
     <fileset.entrypoints>
       <file custom-data-expanded="false" value="${PROJECT_ROOT}\kalman_filter.m">
-        <Marker>1520194558598</Marker>
+        <Marker>1520360026670</Marker>
       </file>
     </fileset.entrypoints>
     <fileset.testbench>
@@ -905,14 +915,15 @@
         <Inputs fileName="kalman_filter.m" functionName="kalman_filter">
           <Input Name="mu" typeId="0" />
           <Input Name="cov" typeId="1" />
-          <Input Name="y" typeId="0" />
-          <Input Name="C" typeId="1" />
+          <Input Name="y" typeId="2" />
+          <Input Name="C" typeId="3" />
           <Input Name="Q_est" typeId="1" />
-          <Input Name="R_est" typeId="1" />
+          <Input Name="R_est" typeId="4" />
+          <Input Name="dt" typeId="5" />
           <idpTable>
             <type typeId="0">
               <Class>double</Class>
-              <Size>4 x 1</Size>
+              <Size>8 x 1</Size>
               <Value />
               <InitialValue />
               <UserDefined>false</UserDefined>
@@ -920,7 +931,39 @@
             </type>
             <type typeId="1">
               <Class>double</Class>
+              <Size>8 x 8</Size>
+              <Value />
+              <InitialValue />
+              <UserDefined>false</UserDefined>
+              <Complex>false</Complex>
+            </type>
+            <type typeId="2">
+              <Class>double</Class>
+              <Size>4 x 1</Size>
+              <Value />
+              <InitialValue />
+              <UserDefined>false</UserDefined>
+              <Complex>false</Complex>
+            </type>
+            <type typeId="3">
+              <Class>double</Class>
+              <Size>4 x 8</Size>
+              <Value />
+              <InitialValue />
+              <UserDefined>false</UserDefined>
+              <Complex>false</Complex>
+            </type>
+            <type typeId="4">
+              <Class>double</Class>
               <Size>4 x 4</Size>
+              <Value />
+              <InitialValue />
+              <UserDefined>false</UserDefined>
+              <Complex>false</Complex>
+            </type>
+            <type typeId="5">
+              <Class>double</Class>
+              <Size>1 x 1</Size>
               <Value />
               <InitialValue />
               <UserDefined>false</UserDefined>

@@ -11,13 +11,14 @@
 #include "kalman_filter_initialize.h"
 
 typedef enum SerialCommand {
-  ManualZCommand     = (int)'Z',
-  ManualRollCommand  = (int)'R',
-  ManualPitchCommand = (int)'P',
-  ManualYawCommand   = (int)'Y',
-  VelocityCommand    = (int)'V'
+  ZVelCommand      = (int)'Z',
+  RollTrimCommand  = (int)'R',
+  PitchTrimCommand = (int)'P',
+  YawVelCommand    = (int)'Y',
+  XVelCommand      = (int)'X'
 } SerialCommand;
 
+unsigned long last_command_time;
 
 void setup() {
   init_motors();
@@ -28,7 +29,9 @@ void setup() {
   kalman_filter_initialize();
 
   Serial.begin(115200);
-  Serial.setTimeout(5);
+  Serial.setTimeout(0);
+
+  last_command_time = millis();
 }
 
 void loop() {
@@ -38,76 +41,75 @@ void loop() {
   }
 
   // Check Serial every so often
-  if (1) {
-    // Usage: dlqr_mode = FullState | ManualZ;
-    // Usage: manual[0] = -0.1; // To go up
-    dlqr_mode = FullState;
-    String s = Serial.readString();
-    char *line = const_cast<char*> (s.c_str());
-    char *p_next = line;
-    bool done = false;
-    while (*p_next != '\0' && !done) {
-      switch (*p_next) {
-      case ManualZCommand:
-        dlqr_mode |= ManualZ;
-        manual[0] = strtod(p_next+1, &p_next);
-        Serial.print(manual[0]);
-        break;
-      case ManualRollCommand:
-        dlqr_mode |= ManualRoll;
-        manual[1] = strtod(p_next+1, &p_next);
-        Serial.print(manual[1]);
-        break;
-      case ManualPitchCommand:
-        dlqr_mode |= ManualPitch;
-        manual[2] = strtod(p_next+1, &p_next);
-        Serial.print(manual[2]);
-        break;
-      case ManualYawCommand:
-        dlqr_mode |= ManualYaw;
-        manual[3] = strtod(p_next+1, &p_next);
-        Serial.print(manual[3]);
-        break;
-      case VelocityCommand:
-        target_vel = strtod(p_next+1, &p_next);
-        Serial.print(target_vel);
-        break;
-      default:
-        done = true;
-        break;
-      }
-    }
+  if ((millis() - last_command_time) > 5) {
+    last_command_time = millis();
+    read_serial_commands();
   }
 
-  if (dlqr_mode & ManualZ) {
-    Serial.print((char)ManualZ);
-    Serial.print(manual[0]);
-  }
-  if (dlqr_mode & ManualRoll) {
-    Serial.print((char)ManualRoll);
-    Serial.print(manual[1]);
-  }
-  if (dlqr_mode & ManualPitch) {
-    Serial.print((char)ManualPitch);
-    Serial.print(manual[2]);
-  }
-  if (dlqr_mode & ManualYaw) {
-    Serial.print((char)ManualYaw);
-    Serial.print(manual[3]);
-  }
-  Serial.println('a');
   // Measurement Vector
   measure_sonars(y);   // How often can we ping?
   // measure_MPU9520(y);
   measure_LSM9DS0(y);
 
   // Calculate State Vector
-  kalman_filter(mu, cov, y, C, Q_est, R_est,
+  double dt = IMU_LSM9DS0.deltat;
+  kalman_filter(mu, cov, y, C, Q_est, R_est, dt,
                 mu, cov);
 
   // Calculate Control Outputs
-  dlqr(mu, motor_power);
+  controller(mu, motor_power);
 
   // Execute Control Outputs
   set_motors();
+
+  // Logging
+  log_serial();
+}
+
+void log_serial() {
+  // for (int i = 0; i < NUM_MEASURE; i++) {
+  //   Serial.print(y[i]);
+  //   Serial.print(',');
+  // }
+  for (int i = 0; i < NUM_STATES; i++) {
+    Serial.print(mu[i]);
+  
+    Serial.print(',');
+  }
+  Serial.println();
+}
+
+void read_serial_commands() {
+  dlqr_mode = FullState;
+  String s = Serial.readString();
+  char *line = const_cast<char*> (s.c_str());
+  char *p_next = line;
+  bool done = false;
+  while (*p_next != '\0' && !done) {
+    switch (*p_next) {
+    case ZVelCommand:
+      dlqr_mode |= ManZVel;
+      man_z_vel = strtod(p_next+1, &p_next);
+      break;
+    case RollTrimCommand:
+      dlqr_mode |= ManRollTrim;
+      man_r_trim = strtol(p_next+1, &p_next, 10);
+      break;
+    case PitchTrimCommand:
+      dlqr_mode |= ManPitchTrim;
+      man_p_trim = strtol(p_next+1, &p_next, 10);
+      break;
+    case YawVelCommand:
+      dlqr_mode |= ManYawVel;
+      man_y_vel = strtod(p_next+1, &p_next);
+      break;
+    case XVelCommand:
+      dlqr_mode |= ManXVel;
+      man_x_vel = strtol(p_next+1, &p_next, 10);
+      break;
+    default:
+      done = true;
+      break;
+    }
+  }
 }

@@ -19,13 +19,14 @@
 #include "rtwtypes.h"
 #include "kalman_filter_types.h"
 
-#define NUM_STATES 4
+#define NUM_STATES 8
+#define NUM_MEASURE 4
 extern double mu[NUM_STATES];
 extern double cov[NUM_STATES*NUM_STATES];
-extern double y[NUM_STATES];
-extern double C[NUM_STATES*NUM_STATES];
+extern double y[NUM_MEASURE];
+extern double C[NUM_MEASURE*NUM_STATES];
 extern double Q_est[NUM_STATES*NUM_STATES];
-extern double R_est[NUM_STATES*NUM_STATES];
+extern double R_est[NUM_MEASURE*NUM_MEASURE];
 
 /* Function Declarations */
 extern void kalman_filter_initialize();

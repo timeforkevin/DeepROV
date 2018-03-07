@@ -231,9 +231,9 @@ public:
   float abias[3] = {0, 0, 0};
   float gbias[3] = {0, 0, 0};
   // These values are the RAW signed 16-bit readings from the sensors.
-  int16_t gx, gy, gz; // x, y, and z axis readings of the gyroscope
-  int16_t ax, ay, az; // x, y, and z axis readings of the accelerometer
-  int16_t mx, my, mz; // x, y, and z axis readings of the magnetometer
+  float gx, gy, gz; // x, y, and z axis readings of the gyroscope
+  float ax, ay, az; // x, y, and z axis readings of the accelerometer
+  float mx, my, mz; // x, y, and z axis readings of the magnetometer
   int16_t temperature;
   float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};    // vector to hold quaternion
   float eInt[3] = {0.0f, 0.0f, 0.0f};       // vector to hold integral error for Mahony method
@@ -277,19 +277,19 @@ public:
   // This function will read all six gyroscope output registers.
   // The readings are stored in the class' gx, gy, and gz variables. Read
   // those _after_ calling readGyro().
-  void readGyro(int16_t * destination);
+  void readGyro();
   
   // readAccel() -- Read the accelerometer output registers.
   // This function will read all six accelerometer output registers.
   // The readings are stored in the class' ax, ay, and az variables. Read
   // those _after_ calling readAccel().
-  void readAccel(int16_t * destination);
+  void readAccel();
   
   // readMag() -- Read the magnetometer output registers.
   // This function will read all six magnetometer output registers.
   // The readings are stored in the class' mx, my, and mz variables. Read
   // those _after_ calling readMag().
-  void readMag(int16_t * destination);
+  void readMag();
 
   // readTemp() -- Read the temperature output register.
   // This function will read two temperature output registers.
