@@ -26,6 +26,11 @@ unsigned long state_init_time;
 long last_motor_set = 0;
 
 void setup() {
+
+  Serial.begin(115200);
+  Serial.setTimeout(30);
+  Serial.println("Ready");
+
   init_motors();
   init_leak_detector();
 #ifdef USE_MPU9250
@@ -38,9 +43,6 @@ void setup() {
   init_LSM9DS1();
 #endif
   kalman_filter_initialize();
-
-  Serial.begin(115200);
-  Serial.setTimeout(30);
 
   // Motor Init Time
   for (int i = 0; i < NUM_MOTORS; i++) {
@@ -73,8 +75,6 @@ void loop() {
   }
   if (Serial.available() > 0) {
     read_serial_csv();
-    // Logging
-    log_serial();
   }
 
   // measure_depth(y);
@@ -109,6 +109,8 @@ void loop() {
     last_motor_set = millis();
     set_motors();
   }
+  // Logging
+  log_serial();
 }
 
 void log_serial() {
