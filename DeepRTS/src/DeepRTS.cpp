@@ -29,7 +29,6 @@ void setup() {
 
   Serial.begin(115200);
   Serial.setTimeout(30);
-  Serial.println("Ready");
 
   init_motors();
   init_leak_detector();
@@ -64,6 +63,7 @@ void setup() {
   delay(1000);
 
   state_init_time = millis() + 5000;
+  Serial.println("Serial Ready");
 }
 
 
