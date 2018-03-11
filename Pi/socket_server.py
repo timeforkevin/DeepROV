@@ -17,7 +17,8 @@ if __name__ == '__main__':
     arduino = serial.Serial(sys.argv[3], sys.argv[4], timeout=1)
 
     while True:
-        ard_input = arduino.readline().rstrip('\n')
+        bytesToRead = arduino.inWaiting()
+        ard_input = arduino.read(bytesToRead)
         if ard_input:
             print("Arduino Data= {}".format(ard_input))
 
