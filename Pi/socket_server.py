@@ -14,15 +14,16 @@ if __name__ == '__main__':
     conn, addr = server.accept()
 
 
-    arduino = serial.Serial(sys.argv[3], sys.argv[4], timeout=2)
+    arduino = serial.Serial(sys.argv[3], sys.argv[4], timeout=1)
 
     while True:
+        ard_input = arduino.readline().rstrip('\n')
+        if ard_input:
+            print("Arduino Data= {}".format(ard_input))
+
         data = conn.recv(5000)
         if data:
             data = data.decode()
-            data = data.split('\n')[-2] + '\n'
-            # print('Client Data= {}'.format(data))
+            data = data.split('\n')[-2]
+            print('Client Data= {}'.format(data))
             arduino.write(data.encode())
-            ard_input = arduino.readline().rstrip('\n')
-            if ard_input:
-                print("Arduino Data= {}".format(ard_input))
