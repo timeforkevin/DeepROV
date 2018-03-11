@@ -3,10 +3,6 @@ from camera import VideoCamera
 
 app = Flask(__name__)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
 def gen_frame(camera, analyze):
     while True:
         if analyze:
@@ -16,14 +12,25 @@ def gen_frame(camera, analyze):
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
-@app.route('/video_feed')
-def video_feed():
+@app.route('/video_feed_camera0')
+def video_feed_camera0():
     analyze = request.args.get('analyze')
     if analyze is None:
         analyze = False
     else:
         analyze = int(analyze)
-    return Response(gen_frame(VideoCamera(), analyze),
+    return Response(gen_frame(VideoCamera(0), analyze),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/video_feed_camera1')
+def video_feed_camera1():
+    analyze = request.args.get('analyze')
+    if analyze is None:
+        analyze = False
+    else:
+        analyze = int(analyze)
+    return Response(gen_frame(VideoCamera(1), analyze),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 

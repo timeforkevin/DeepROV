@@ -21,6 +21,7 @@ if __name__ == '__main__':
 
     count = 0
 
+    flag = False
     while True:
         ard_input = arduino.read(arduino.inWaiting())
         if ard_input:
@@ -30,6 +31,6 @@ if __name__ == '__main__':
         data = conn.recv(5000)
         if data and count > 20:
             data = data.decode()
-            data = data.split('\n')[-2]
+            data = data.split('\n')[-2] + '\n'
             print('Client Data= {}'.format(data))
             arduino.write(data.encode())

@@ -1,8 +1,10 @@
 #include "Motor.h"
 #include "LeakDetector.h"
+#include "Sonar.h"
 
 #define NUM_MOTORS 5
 long motor_pwms[5] = {1500, 1500, 1500, 1500};
+double s[2] = {0, 0};
 
 void setPWM(long val) {
   if(val > 10000 && val < 20000) motor_pwms[0] = val - 10000;
@@ -39,6 +41,7 @@ void printPWMs() {
 void setup() {
   Serial.begin(115200);
   Serial.setTimeout(20);
+  // init_sonars();
   init_motors();
   set_motors_raw(motor_pwms);
   delay(2000);
