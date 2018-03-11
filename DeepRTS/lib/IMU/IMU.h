@@ -5,16 +5,27 @@
 #include "quaternionFilters.h"
 
 
-// #define USE_MPU9520
-#define USE_LSM9DS0
+// #define USE_MPU9250
+// #define USE_LSM9DS0
+#define USE_LSM9DS1
 
+#ifdef USE_LSM9DS1
+#include "SparkFunLSM9DS1.h"
 
+// SDO_XM and SDO_G are both pulled high, so our addresses are:
+#define LSM9DS1_M 0x1E // Would be 0x1C if SDO_M is LOW
+#define LSM9DS1_AG  0x6B // Would be 0x6A if SDO_AG is LOW
+extern LSM9DS1 IMU_LSM9DS1;
 
-#ifdef USE_MPU9520
+void init_LSM9DS1();
+void measure_LSM9DS1(double y[]);
+#endif
+
+#ifdef USE_MPU9250
 #include "MPU9250.h"
 extern MPU9250 IMU_MPU9250;
 void init_MPU9250();
-void measure_MPU9520(double y[]);
+void measure_MPU9250(double y[]);
 #endif
 
 #ifdef USE_LSM9DS0

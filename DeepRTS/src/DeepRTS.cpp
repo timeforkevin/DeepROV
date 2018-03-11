@@ -1,6 +1,6 @@
 
 #include "Motor.h"
-#include "Sonar.h"
+#include "DepthSensor.h"
 #include "LeakDetector.h"
 #include "IMU.h"
 #include "Controller.h"
@@ -18,98 +18,197 @@ typedef enum SerialCommand {
   XVelCommand      = (int)'X'
 } SerialCommand;
 
-unsigned long last_command_time;
+void log_serial();
+void read_serial_csv();
+void read_serial_commands();
+
+unsigned long state_init_time;
+long last_motor_set = 0;
 
 void setup() {
   init_motors();
-  init_sonars();
   init_leak_detector();
-  // init_MPU9250();
+#ifdef USE_MPU9250
+  init_MPU9250();
+#endif
+#ifdef USE_LSM9DS0
   init_LSM9DS0();
+#endif
+#ifdef USE_LSM9DS1
+  init_LSM9DS1();
+#endif
   kalman_filter_initialize();
 
   Serial.begin(115200);
-  Serial.setTimeout(0);
+  Serial.setTimeout(30);
 
-  last_command_time = millis();
+  // Motor Init Time
+  for (int i = 0; i < NUM_MOTORS; i++) {
+    motor_power[i] = 0;
+  }
+  set_motors();
+  delay(1000);
+  
+  for (int i = 0; i < NUM_MOTORS; i++) {
+    motor_power[i] = 100;
+  }
+  set_motors();
+  delay(2000);
+  
+  for (int i = 0; i < NUM_MOTORS; i++) {
+    motor_power[i] = 0;
+  }
+  set_motors();
+  delay(1000);
+
+  state_init_time = millis() + 5000;
 }
 
+
 void loop() {
+
   if (leaky()) {
     // Do the squeaky
     // Can't take this L
   }
-
-  // Check Serial every so often
-  if ((millis() - last_command_time) > 5) {
-    last_command_time = millis();
-    read_serial_commands();
+  if (Serial.available() > 0) {
+    read_serial_csv();
   }
 
-  // Measurement Vector
-  measure_sonars(y);   // How often can we ping?
-  // measure_MPU9520(y);
+  // measure_depth(y);
+#ifdef USE_MPU9250
+  measure_MPU9250(y);
+  double dt = IMU_MPU9250.deltat;
+#endif
+#ifdef USE_LSM9DS0
   measure_LSM9DS0(y);
+  double dt = IMU_LSM9DS0.deltat;
+#endif
+#ifdef USE_LSM9DS1
+  measure_LSM9DS1(y);
+  double dt = IMU_LSM9DS1.deltat;
+#endif
 
   // Calculate State Vector
-  double dt = IMU_LSM9DS0.deltat;
   kalman_filter(mu, cov, y, C, Q_est, R_est, dt,
                 mu, cov);
 
-  // Calculate Control Outputs
-  controller(mu, motor_power);
+  if (millis() < state_init_time) {
+    // Initialize target Z and Yaw
+    target[0] = mu[0];
+    target[3] = mu[3];
+  } else {
+    // Calculate Control Outputs
+    controller(mu, motor_power);
+  }
 
-  // Execute Control Outputs
-  set_motors();
-
+  if (millis() - last_motor_set > 100) {
+    // Execute Control Outputs every 100ms
+    last_motor_set = millis();
+    set_motors();
+  }
   // Logging
   log_serial();
 }
 
 void log_serial() {
   // for (int i = 0; i < NUM_MEASURE; i++) {
-  //   Serial.print(y[i]);
+  //   Serial.print(y[i],4);
   //   Serial.print(',');
   // }
-  for (int i = 0; i < NUM_STATES; i++) {
-    Serial.print(mu[i]);
-  
+  // for (int i = 0; i < 4; i++) {
+  //   Serial.print(mu[i]);
+  //   Serial.print(',');
+  // }
+  for (int i = 0; i < NUM_MOTORS; i++) {
+    Serial.print(motor_power[i]);
     Serial.print(',');
   }
   Serial.println();
 }
 
-void read_serial_commands() {
+void read_serial_csv() {
+  // Reset dlqr_mode
   dlqr_mode = FullState;
-  String s = Serial.readString();
-  char *line = const_cast<char*> (s.c_str());
-  char *p_next = line;
-  bool done = false;
-  while (*p_next != '\0' && !done) {
-    switch (*p_next) {
-    case ZVelCommand:
-      dlqr_mode |= ManZVel;
-      man_z_vel = strtod(p_next+1, &p_next);
-      break;
-    case RollTrimCommand:
-      dlqr_mode |= ManRollTrim;
-      man_r_trim = strtol(p_next+1, &p_next, 10);
-      break;
-    case PitchTrimCommand:
-      dlqr_mode |= ManPitchTrim;
-      man_p_trim = strtol(p_next+1, &p_next, 10);
-      break;
-    case YawVelCommand:
-      dlqr_mode |= ManYawVel;
-      man_y_vel = strtod(p_next+1, &p_next);
-      break;
-    case XVelCommand:
-      dlqr_mode |= ManXVel;
-      man_x_vel = strtol(p_next+1, &p_next, 10);
-      break;
-    default:
-      done = true;
-      break;
+
+  String input = Serial.readString();
+  int counter = 0;
+  int lastIndex = 0;
+
+  for (int i = 0; i < input.length(); i++) {
+    if (input.substring(i, i+1) == "," || input.substring(i, i+1) == "\n") {
+      Serial.print(input.substring(lastIndex, i));
+      Serial.print(',');
+      switch (counter) {
+      case 0:
+        dlqr_mode |= ManXVel;
+        man_x_vel = input.substring(lastIndex, i).toInt();
+        break;
+      case 1:
+        dlqr_mode |= ManRollTrim;
+        man_r_trim = input.substring(lastIndex, i).toInt();
+        break;
+      case 2:
+        dlqr_mode |= ManYawVel;
+        man_y_vel = (double)input.substring(lastIndex, i).toInt();
+        break;
+      case 3:
+        dlqr_mode |= ManZVel;
+        man_z_vel = (double)input.substring(lastIndex, i).toInt();
+        break;
+      case 4:
+        dlqr_mode |= ManPitchTrim;
+        man_p_trim = input.substring(lastIndex, i).toInt();
+        break;
+      }
+      lastIndex = i + 1;
+      counter++;
     }
   }
+  // Serial.print(man_x_vel);
+  // Serial.print(',');
+  // Serial.print(man_r_trim);
+  // Serial.print(',');
+  // Serial.print(man_y_vel);
+  // Serial.print(',');
+  // Serial.print(man_z_vel);
+  // Serial.print(',');
+  // Serial.print(man_p_trim);
+  Serial.print(':');
 }
+
+// void read_serial_commands() {
+//   // Reset dlqr_mode
+//   dlqr_mode = FullState;
+//   String s = Serial.readString();
+//   char *line = const_cast<char*> (s.c_str());
+//   char *p_next = line;
+//   bool done = false;
+//   while (*p_next != '\0' && !done) {
+//     switch (*p_next) {
+//     case ZVelCommand:
+//       dlqr_mode |= ManZVel;
+//       man_z_vel = strtod(p_next+1, &p_next);
+//       break;
+//     case RollTrimCommand:
+//       dlqr_mode |= ManRollTrim;
+//       man_r_trim = strtol(p_next+1, &p_next, 10);
+//       break;
+//     case PitchTrimCommand:
+//       dlqr_mode |= ManPitchTrim;
+//       man_p_trim = strtol(p_next+1, &p_next, 10);
+//       break;
+//     case YawVelCommand:
+//       dlqr_mode |= ManYawVel;
+//       man_y_vel = strtod(p_next+1, &p_next);
+//       break;
+//     case XVelCommand:
+//       dlqr_mode |= ManXVel;
+//       man_x_vel = strtol(p_next+1, &p_next, 10);
+//       break;
+//     default:
+//       done = true;
+//       break;
+//     }
+//   }
+// }

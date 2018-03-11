@@ -1,9 +1,9 @@
 clear all;
 
-W1 = 6; % [in] distance of 'handling' motors from center
-W2 = 6; % [in] distance of 'drive' motors from center
-L1 = 8; % [in] distance of front handling motors from center
-L2 = 8; % [in] distance of rear hanling motor from center
+W1 = -6; % [in] distance of 'handling' motors from center
+W2 = -6; % [in] distance of 'drive' motors from center
+L1 = -8; % [in] distance of front handling motors from center
+L2 = -8; % [in] distance of rear hanling motor from center
 
 M = 25.6; % [lb]
 
@@ -38,8 +38,8 @@ Bd(2,3) =      -T100_THRUST*W2/Jxx*dt*dt;
 Bd(2,5) =       T100_THRUST*W2/Jxx*dt*dt;
 Bd(3,[3,5]) =  -T100_THRUST*L1/Jyy*dt*dt;
 Bd(3,4) =       T100_THRUST*L2/Jyy*dt*dt;
-Bd(4,1) =      -T100_THRUST*W1/Jzz*dt*dt;
-Bd(4,2) =       T100_THRUST*W1/Jzz*dt*dt;
+Bd(4,1) =       T100_THRUST*W1/Jzz*dt*dt;
+Bd(4,2) =      -T100_THRUST*W1/Jzz*dt*dt;
 
 Qd = diag([1 1 1 1]);
 Rd = diag([10 10 10 10 10]);
@@ -60,8 +60,8 @@ B(6,3) =      -T100_THRUST*W2/Jxx*dt*dt;
 B(6,5) =       T100_THRUST*W2/Jxx*dt*dt;
 B(7,[3,5]) =  -T100_THRUST*L1/Jyy*dt*dt;
 B(7,4) =       T100_THRUST*L2/Jyy*dt*dt;
-B(8,1) =      -T100_THRUST*W1/Jzz*dt*dt;
-B(8,2) =       T100_THRUST*W1/Jzz*dt*dt;
+B(8,1) =       T100_THRUST*W1/Jzz*dt*dt;
+B(8,2) =      -T100_THRUST*W1/Jzz*dt*dt;
 
 C = [diag([1 1 1 1]), diag([0 0 0 0])];
 
@@ -90,10 +90,11 @@ R_est = 2*R;
 
 
 x(:,1) = [0; 0; 0; 0; 0; 0; 0; 0;];
-mu_tar  = [36; 0; 0; 0; 0; 0; 0; 0;];
+mu_tar  = [0; 0; 0; 0; 0; 0; 0; 0;];
 mu_thresh = [2; 5*pi/180; 5*pi/180; 5*pi/180;
              0.4; 1*pi/180; 1*pi/180; 1*pi/180;];
-
+mu_thresh = mu_thresh * 2;
+         
 u_min = [-1;-1;-1;-1;-1;];
 u_max = [ 1; 1; 1; 1; 1;];
 u_delay = round(0.33/dt);

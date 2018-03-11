@@ -19,11 +19,11 @@ typedef enum ControlMode {
 extern double KLQR[NUM_MOTORS*NUM_STATES];
 extern double target[NUM_STATES];
 
-extern long   man_x_vel;
+extern int   man_x_vel;
 extern double man_z_vel;
 extern double man_y_vel;
-extern long   man_r_trim;
-extern long   man_p_trim;
+extern int   man_r_trim;
+extern int   man_p_trim;
 extern double pitch_factor;
 extern unsigned int dlqr_mode;
 
