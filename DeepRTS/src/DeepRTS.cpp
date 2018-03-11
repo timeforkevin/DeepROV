@@ -73,6 +73,8 @@ void loop() {
   }
   if (Serial.available() > 0) {
     read_serial_csv();
+    // Logging
+    log_serial();
   }
 
   // measure_depth(y);
@@ -107,8 +109,6 @@ void loop() {
     last_motor_set = millis();
     set_motors();
   }
-  // Logging
-  log_serial();
 }
 
 void log_serial() {
