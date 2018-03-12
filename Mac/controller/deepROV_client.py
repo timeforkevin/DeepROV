@@ -12,6 +12,7 @@ COMMAND_MAP = {
     'R': '0',
 }
 
+
 def build_msg():
     msg = COMMAND_MAP['X'] + ',' + COMMAND_MAP['R'] + ',' + COMMAND_MAP['Y'] + ',' + COMMAND_MAP['Z'] + ',' + COMMAND_MAP['P'] + '\n'
     return msg
@@ -34,16 +35,24 @@ def left_trigger(val):
     COMMAND_MAP['Z'] = str(int(val))
 
 def Y(val):
-    COMMAND_MAP['P'] = str(1)
+    if val == 1:
+        COMMAND_MAP['P'] = str(5)
 
 def A(val):
-    COMMAND_MAP['P'] = str(-1)
+    if val == 1:
+        COMMAND_MAP['P'] = str(-5)
 
 def B(val):
-    COMMAND_MAP['R'] = str(1)
+    if val == 1:
+        COMMAND_MAP['R'] = str(5)
 
 def X(val):
-    COMMAND_MAP['R'] = str(-1)
+    if val == 1:
+        COMMAND_MAP['R'] = str(-5)
+
+def reset_command_vals():
+    COMMAND_MAP['R'] = str(0)
+    COMMAND_MAP['P'] = str(0)
 
 
 if __name__ == '__main__':
@@ -77,6 +86,7 @@ if __name__ == '__main__':
             msg = build_msg()
             print(msg)
             client_socket.sendall(msg.encode())
+            reset_command_vals()
             time.sleep(0.2)
 
     except KeyboardInterrupt:
