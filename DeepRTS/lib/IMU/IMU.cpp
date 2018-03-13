@@ -82,8 +82,8 @@ void measure_LSM9DS1(double y[]) {
   double pitch = -asin(2.0f * (IMU_LSM9DS1.q[0] * IMU_LSM9DS1.q[2] - IMU_LSM9DS1.q[1] * IMU_LSM9DS1.q[3]));
   double roll  = atan2(-2.0f * (IMU_LSM9DS1.q[0] * IMU_LSM9DS1.q[1] + IMU_LSM9DS1.q[2] * IMU_LSM9DS1.q[3]), -1 + 2.0f * (IMU_LSM9DS1.q[1]*IMU_LSM9DS1.q[1] + IMU_LSM9DS1.q[2]*IMU_LSM9DS1.q[2]));
 
-  y[1] = roll;
-  y[2] = pitch;
+  y[1] = -roll;
+  y[2] = -pitch;
   y[3] = yaw;
 }
 
@@ -216,8 +216,8 @@ void measure_MPU9250(double y[]) {
   IMU_MPU9250.yaw   = atan2(2.0f * (IMU_MPU9250.q[1] * IMU_MPU9250.q[2] + IMU_MPU9250.q[0] * IMU_MPU9250.q[3]), 1 - 2.0f * (IMU_MPU9250.q[2]*IMU_MPU9250.q[2] + IMU_MPU9250.q[3]*IMU_MPU9250.q[3]));
   IMU_MPU9250.pitch = asin(2.0f * (IMU_MPU9250.q[0] * IMU_MPU9250.q[2] - IMU_MPU9250.q[1] * IMU_MPU9250.q[3]));
   IMU_MPU9250.roll  = atan2(-2.0f * (IMU_MPU9250.q[0] * IMU_MPU9250.q[1] + IMU_MPU9250.q[2] * IMU_MPU9250.q[3]), -1 + 2.0f * (IMU_MPU9250.q[1]*IMU_MPU9250.q[1] + IMU_MPU9250.q[2]*IMU_MPU9250.q[2]));
-  y[1] = IMU_MPU9250.roll;
-  y[2] = IMU_MPU9250.pitch;
+  y[1] = -IMU_MPU9250.roll;
+  y[2] = -IMU_MPU9250.pitch;
   y[3] = IMU_MPU9250.yaw;
 }
 
@@ -291,8 +291,8 @@ void measure_LSM9DS0(double y[]) {
   IMU_LSM9DS0.pitch = asin(2.0f * (IMU_LSM9DS0.q[0] * IMU_LSM9DS0.q[2] - IMU_LSM9DS0.q[1] * IMU_LSM9DS0.q[3]));
   IMU_LSM9DS0.roll  = atan2(-2.0f * (IMU_LSM9DS0.q[0] * IMU_LSM9DS0.q[1] + IMU_LSM9DS0.q[2] * IMU_LSM9DS0.q[3]), -1 + 2.0f * (IMU_LSM9DS0.q[1]*IMU_LSM9DS0.q[1] + IMU_LSM9DS0.q[2]*IMU_LSM9DS0.q[2]));
 
-  y[1] = IMU_LSM9DS0.roll;
-  y[2] = IMU_LSM9DS0.pitch;
+  y[1] = -IMU_LSM9DS0.roll;
+  y[2] = -IMU_LSM9DS0.pitch;
   y[3] = IMU_LSM9DS0.yaw;
 }
 
