@@ -30,7 +30,7 @@ class CoralCapture:
         print("writing to file: {}".format(file_name))
         video_writter = cv2.VideoWriter(
             file_name,
-            cv2.VideoWriter_fourcc('M','J','P','G'),
+            cv2.VideoWriter_fourcc(*'XVID'),
             self.fps,
             (frame_width,frame_height)
         )
@@ -46,3 +46,8 @@ class CoralCapture:
     def cleanup(self):
         self.camera.release()
         cv2.destroyAllWindows()
+
+
+if __name__ == '__main__':
+    cc = CoralCapture(60, '/home/pi/Desktop/videos')
+    cc.continuous_capture(10)

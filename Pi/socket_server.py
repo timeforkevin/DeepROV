@@ -1,6 +1,7 @@
 import socket
 import sys
 import serial
+import time
 
 if __name__ == '__main__':
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -14,17 +15,22 @@ if __name__ == '__main__':
     conn, addr = server.accept()
 
 
-    arduino = serial.Serial(sys.argv[3], sys.argv[4], timeout=1)
+    arduino = serial.Serial(sys.argv[3], sys.argv[4], timeout=3)
+    arduino.flushInput()
+    arduino.flushOutput()
 
+    count = 0
+
+    flag = False
     while True:
-        bytesToRead = arduino.inWaiting()
-        ard_input = arduino.read(bytesToRead)
+        ard_input = arduino.read(arduino.inWaiting())
         if ard_input:
+            count += 1
             print("Arduino Data= {}".format(ard_input))
 
         data = conn.recv(5000)
-        if data:
+        if data and count > 20:
             data = data.decode()
-            data = data.split('\n')[-2]
+            data = data.split('\n')[-2] + '\n'
             print('Client Data= {}'.format(data))
             arduino.write(data.encode())

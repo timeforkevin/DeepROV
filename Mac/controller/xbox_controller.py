@@ -82,10 +82,10 @@ class XboxController(threading.Thread):
 
     #pygame constants for the buttons of the xbox controller
     class PyGameButtons():
-        A = 0
-        B = 1
-        X = 2
-        Y = 3
+        A = 11
+        B = 12
+        X = 13
+        Y = 14
         LB = 4
         RB = 5
         BACK = 6

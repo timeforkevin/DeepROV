@@ -10,11 +10,10 @@ import numpy as np
 
 class VideoCamera(object):
 
-    def __init__(self):
-
-        self.vs = VideoStream(src=0).start()
+    def __init__(self, camera_num):
+        self.vs = VideoStream(src=camera_num).start()
         self.fps = FPS().start()
-        self.classes = self.classes = [
+        self.classes = [
             'background',
             'aeroplane',
             'bicycle',
@@ -35,7 +34,7 @@ class VideoCamera(object):
             'sheep',
             'sofa',
             'train',
-            'tvmonitor',
+            'tvmonitor'
         ]
         # rows = open('synset_words.txt').read().strip().split('\n')
         # self.classes = [r[r.find(' ') + 1:].split(',')[0] for r in rows]
@@ -60,6 +59,7 @@ class VideoCamera(object):
 
     def analyze_frame(self):
         frame = self.vs.read()
+        self.fps.update()
         frame = imutils.resize(frame, width=400)
 
         (h, w) = frame.shape[:2]
@@ -108,7 +108,6 @@ class VideoCamera(object):
                     2,
                     )
 
-        self.fps.update()
 
         (ret, jpeg) = cv2.imencode('.jpg', frame)
         return jpeg.tobytes()
