@@ -72,6 +72,7 @@ void loop() {
   if (leaky()) {
     // Do the squeaky
     // Can't take this L
+    Serial.println("WARNING: LEAKY");
   }
   if (Serial.available() > 0) {
     read_serial_csv();
