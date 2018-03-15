@@ -62,7 +62,7 @@ void setup() {
   set_motors();
   delay(1000);
 
-  state_init_time = millis() + 5000;
+  state_init_time = millis() + 15000;
   Serial.println("Serial Ready");
 }
 
