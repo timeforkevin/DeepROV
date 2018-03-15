@@ -30,6 +30,7 @@ void setup() {
 
   Serial.begin(115200);
   Serial.setTimeout(30);
+  analogReference(INTERNAL2V56);
 
   init_motors();
   init_leak_detector();
