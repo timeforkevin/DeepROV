@@ -18,8 +18,6 @@ typedef enum SerialCommand {
   XVelCommand      = (int)'X'
 } SerialCommand;
 
-int droopPin = A15;
-int voltage = 0;
 
 void log_serial();
 void read_serial_csv();
@@ -32,9 +30,6 @@ void setup() {
 
   Serial.begin(115200);
   Serial.setTimeout(30);
-
-  voltage = analogRead(droopPin) * 5 * 3 / 1023;
-  Serial.print("Voltage: "); Serial.println(voltage);
 
   init_motors();
   init_leak_detector();
@@ -74,8 +69,7 @@ void setup() {
 
 
 void loop() {
-  voltage = analogRead(droopPin) * 5 * 3 / 1023;
-  Serial.print("Voltage: "); Serial.println(voltage);
+
 
   if (leaky()) {
     // Do the squeaky

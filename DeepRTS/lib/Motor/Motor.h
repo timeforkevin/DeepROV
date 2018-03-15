@@ -9,12 +9,14 @@
 #define NUM_MOTORS 5
 #define MIN(X,Y) (((X) < (Y)) ? (X) : (Y))
 #define MAX(X,Y) (((X) > (Y)) ? (X) : (Y))
+#define DROOP_PIN A15
 
 extern int motor_power[NUM_MOTORS];
 
 void init_motors();
 void set_motors();
 void set_motors_raw(long *pwms);
+double calc_droop();
 
 // typedef enum MOTORS {
 //   T100,

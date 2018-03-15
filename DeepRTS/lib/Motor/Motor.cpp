@@ -30,13 +30,16 @@ const bool ccw_motors[NUM_MOTORS] = {false, true, false, true, true};
 Servo motors[NUM_MOTORS];
 int motor_power[NUM_MOTORS];
 
+
 // TODO: Maybe needed for BFM
 void init_LUT() {
 
 }
 
 void set_motors() {
+  double df = calc_droop();
   for (int i = 0; i < NUM_MOTORS; i++) {
+    motor_power[i] *= df;
     int power_sat = MAX(MIN(motor_power[i],POWER_MAX),POWER_MIN);
     if (ccw_motors[i]) {
       power_sat = -power_sat;
@@ -66,4 +69,12 @@ void init_motors() {
     motor_power[i] = 0;
   }
   set_motors();
+}
+
+double calc_droop() {
+  double voltage = (double)analogRead(DROOP_PIN) * 2.56 * 12.0 / (2.5 * 1023.0);
+  Serial.print("Voltage is: "); Serial.println(voltage);
+  double droop_factor = 1;
+  if (voltage < 9) droop_factor = exp(-2.5*(9-voltage));
+  return droop_factor;
 }

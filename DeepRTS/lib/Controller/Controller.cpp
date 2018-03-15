@@ -1,4 +1,4 @@
-#define fdg_fact (1.5)
+#define fdg_fact (1.2)
 
 #include "Controller.h"
 
@@ -31,8 +31,8 @@ double target[NUM_STATES] =
 double threshold[NUM_STATES] =
 {
   4,
-  8*DEG_TO_RAD,
-  8*DEG_TO_RAD,
+  6*DEG_TO_RAD,
+  6*DEG_TO_RAD,
   20*DEG_TO_RAD,
   0.8,
   2*DEG_TO_RAD,
