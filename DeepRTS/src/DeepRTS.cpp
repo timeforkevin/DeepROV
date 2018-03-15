@@ -32,6 +32,7 @@ void setup() {
 
   Serial.begin(115200);
   Serial.setTimeout(30);
+  analogReference(INTERNAL2V56);
 
   voltage = analogRead(droopPin) * 5 * 3 / 1023;
   Serial.print("Voltage: "); Serial.println(voltage);
