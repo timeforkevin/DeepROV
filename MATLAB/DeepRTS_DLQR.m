@@ -1,4 +1,5 @@
 clear all;
+close all;
 
 W1 = -6; % [in] distance of 'handling' motors from center
 W2 = -6; % [in] distance of 'drive' motors from center
@@ -21,9 +22,10 @@ T100_THRUST = 5;              % [lbf]
 g = 32.174;                   % [ft/s^2]
 T100_THRUST = T100_THRUST*g;  % [lb*ft/s^2]
 T100_THRUST = T100_THRUST*12; % [lb*in/s^2]
-pf = 1.35;
+pf = 1.35;  % pitch factor (compensator for unbalanced motor and approxs)
 
-cx = 100;
+% drag coeffs.
+cx = 100;   
 cxx = 100;
 cyy = 100;
 czz = 100;
@@ -63,7 +65,7 @@ B(7,4) =       T100_THRUST*L2/Jyy*dt*dt;
 B(8,1) =       T100_THRUST*W1/Jzz*dt*dt;
 B(8,2) =      -T100_THRUST*W1/Jzz*dt*dt;
 
-C = [diag([1 1 1 1]), diag([0 0 0 0])];
+C = [eye(4), zeros(4)];
 
 Q = diag([1 1 1 1 10 10 10 10]);
 R = diag([10 10 10 10 10]);
@@ -118,6 +120,7 @@ for k = 1:length(t)-u_delay
 %     u_next = Kd*dmu(1:4);
     u_next = round(u_next,2);
     
+    % Saturation Check
     if (u_next(4) > u_max(4) || u_next(4) < u_min(4))
         u_next(3) = u_next(3)/abs(u_next(4));
         u_next(5) = u_next(5)/abs(u_next(4));
@@ -141,4 +144,5 @@ legend('1', '2', '3', '4', '5');
 
 figure(2)
 plot(t,x(5,:),t,mu(5,:))
+legend('True State','Est. State')
 
