@@ -26,7 +26,7 @@ const unsigned int T100LUT[POWER_MAX-POWER_MIN+1] = {
 1865,1869,1872,1875,1877,1880,1884,1887,1892,1900};
 
 const unsigned int motor_pins[NUM_MOTORS] = {5, 6, 9, 10, 11};
-const bool ccw_motors[NUM_MOTORS] = {true, false, false, true, true};
+const bool ccw_motors[NUM_MOTORS] = {false, true, false, true, true};
 Servo motors[NUM_MOTORS];
 int motor_power[NUM_MOTORS];
 

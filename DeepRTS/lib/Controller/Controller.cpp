@@ -1,3 +1,4 @@
+#define fdg_fact (1.5)
 
 #include "Controller.h"
 
@@ -30,8 +31,8 @@ double target[NUM_STATES] =
 double threshold[NUM_STATES] =
 {
   4,
-  10*DEG_TO_RAD,
-  10*DEG_TO_RAD,
+  8*DEG_TO_RAD,
+  8*DEG_TO_RAD,
   20*DEG_TO_RAD,
   0.8,
   2*DEG_TO_RAD,
@@ -87,7 +88,7 @@ void dlqr(const double mu[NUM_STATES],
       dmu_j = (fabs(dmu_j) > threshold[j]) ? dmu_j : 0;
 
       // Left Shift trick for i*8
-      u_f[i] += KLQR[(i << 3) + j] * dmu_j * 1.5;
+      u_f[i] += KLQR[(i << 3) + j] * dmu_j * fdg_fact;
     }
   }
 
