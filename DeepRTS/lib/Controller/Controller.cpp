@@ -93,7 +93,7 @@ void dlqr(const double mu[NUM_STATES],
   }
 
   // Fancy Non-Linear Saturation Logic
-  if (u_f[3] > 1.0 || u_f[3] < -1.0) {
+  if (u_f[3] > 100.0/POWER_MAX  || u_f[3] < 100.0/POWER_MIN) {
     u_f[2] /= fabs(u_f[3]);
     u_f[4] /= fabs(u_f[3]);
   }
@@ -102,7 +102,7 @@ void dlqr(const double mu[NUM_STATES],
   u_f[2] /= pitch_factor;
   u_f[4] /= pitch_factor;
   for (int i = 0; i < NUM_MOTORS; i++) {
-    u[i] = round(u_f[i] * 100);
+    u[i] = round(u_f[i] * POWER_MAX);
     u[i] = MAX(MIN(u[i],POWER_MAX),POWER_MIN);
   }
 }
