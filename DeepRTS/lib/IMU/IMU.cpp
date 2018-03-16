@@ -17,15 +17,15 @@ void init_LSM9DS1() {
     Serial.println("Failed to communicate with LSM9DS1.");
   }
 // Set data output ranges; choose lowest ranges for maximum resolution
-// Accelerometer scale can be: A_SCALE_2G, A_SCALE_4G, A_SCALE_6G, A_SCALE_8G, or A_SCALE_16G   
+// Accelerometer scale can be: A_SCALE_2G, A_SCALE_4G, A_SCALE_6G, A_SCALE_8G, or A_SCALE_16G
   IMU_LSM9DS1.setAccelScale(accel_scale::A_SCALE_2G);
 // Gyro scale can be:  G_SCALE__245, G_SCALE__500, or G_SCALE__2000DPS
   IMU_LSM9DS1.setGyroScale(gyro_scale::G_SCALE_245DPS);
-// Magnetometer scale can be: M_SCALE_4GS, M_SCALE_8GS, M_SCALE_12GS, M_SCALE_16GS   
+// Magnetometer scale can be: M_SCALE_4GS, M_SCALE_8GS, M_SCALE_12GS, M_SCALE_16GS
   IMU_LSM9DS1.setMagScale(mag_scale::M_SCALE_4GS);
 
-// Set output data rates  
-// Accelerometer output data rate (ODR) can be: A_ODR_3125 (3.225 Hz), A_ODR_625 (6.25 Hz), A_ODR_125 (12.5 Hz), A_ODR_25, A_ODR_50, 
+// Set output data rates
+// Accelerometer output data rate (ODR) can be: A_ODR_3125 (3.225 Hz), A_ODR_625 (6.25 Hz), A_ODR_125 (12.5 Hz), A_ODR_25, A_ODR_50,
 //                                              A_ODR_100,  A_ODR_200, A_ODR_400, A_ODR_800, A_ODR_1600 (1600 Hz)
   IMU_LSM9DS1.setAccelODR(accel_odr::XL_ODR_238); // Set accelerometer update rate at 100 Hz
 // Accelerometer anti-aliasing filter rate can be 50, 194, 362, or 763 Hz
@@ -40,14 +40,14 @@ void init_LSM9DS1() {
 
 // Magnetometer output data rate can be: 3.125 (ODR_3125), 6.25 (ODR_625), 12.5 (ODR_125), 25, 50, or 100 Hz
   IMU_LSM9DS1.setMagODR(mag_odr::M_ODR_80); // Set magnetometer to update every 80 ms
-  
+
 // Use the FIFO mode to average accelerometer and gyro readings to calculate the biases, which can then be removed from
 // all subsequent measurements.
   // Serial.println("Calibrate Gyro Accel");
   // IMU_LSM9DS1.calibrate(true);
-  Serial.println("Calibrate Mag");
+  // Serial.println("Calibrate Mag");
   IMU_LSM9DS1.calibrateMag(true);
-  Serial.println("Done");
+  // Serial.println("Done");
 }
 void measure_LSM9DS1(double y[]) {
 
@@ -72,7 +72,7 @@ void measure_LSM9DS1(double y[]) {
     float mx = IMU_LSM9DS1.calcMag(IMU_LSM9DS1.mx);
     float my = IMU_LSM9DS1.calcMag(IMU_LSM9DS1.my);
     float mz = IMU_LSM9DS1.calcMag(IMU_LSM9DS1.mz);
-    
+
     IMU_LSM9DS1.updateTime();
     MadgwickQuaternionUpdate(ax, -ay, az,
                              -gx, gy, gz,
@@ -97,7 +97,7 @@ MPU9250 IMU_MPU9250;
 void init_MPU9250() {
   Wire.begin();
   // TWBR = 12;  // 400 kbit/sec I2C speed
-  Serial.begin(38400);
+  // Serial.begin(38400);
 
   // Set up the interrupt pin, its set as active high, push-pull
   pinMode(12, INPUT);
@@ -229,7 +229,7 @@ LSM9DS0 IMU_LSM9DS0(MODE_I2C, LSM9DS0_G, LSM9DS0_XM);
 void init_LSM9DS0() {
   Serial.begin(115200); // Start serial at 115200 bps
 
-  // begin() returns a 16-bit value which includes both the gyro 
+  // begin() returns a 16-bit value which includes both the gyro
   // and accelerometers WHO_AM_I response. You can check this to
   // make sure communication was successful.
   uint32_t status = IMU_LSM9DS0.begin();
@@ -241,15 +241,15 @@ void init_LSM9DS0() {
   delay(2000);
 
 // Set data output ranges; choose lowest ranges for maximum resolution
-// Accelerometer scale can be: A_SCALE_2G, A_SCALE_4G, A_SCALE_6G, A_SCALE_8G, or A_SCALE_16G   
+// Accelerometer scale can be: A_SCALE_2G, A_SCALE_4G, A_SCALE_6G, A_SCALE_8G, or A_SCALE_16G
   IMU_LSM9DS0.setAccelScale(IMU_LSM9DS0.A_SCALE_2G);
 // Gyro scale can be:  G_SCALE__245, G_SCALE__500, or G_SCALE__2000DPS
   IMU_LSM9DS0.setGyroScale(IMU_LSM9DS0.G_SCALE_245DPS);
-// Magnetometer scale can be: M_SCALE_2GS, M_SCALE_4GS, M_SCALE_8GS, M_SCALE_12GS   
+// Magnetometer scale can be: M_SCALE_2GS, M_SCALE_4GS, M_SCALE_8GS, M_SCALE_12GS
   IMU_LSM9DS0.setMagScale(IMU_LSM9DS0.M_SCALE_2GS);
 
-// Set output data rates  
-// Accelerometer output data rate (ODR) can be: A_ODR_3125 (3.225 Hz), A_ODR_625 (6.25 Hz), A_ODR_125 (12.5 Hz), A_ODR_25, A_ODR_50, 
+// Set output data rates
+// Accelerometer output data rate (ODR) can be: A_ODR_3125 (3.225 Hz), A_ODR_625 (6.25 Hz), A_ODR_125 (12.5 Hz), A_ODR_25, A_ODR_50,
 //                                              A_ODR_100,  A_ODR_200, A_ODR_400, A_ODR_800, A_ODR_1600 (1600 Hz)
   IMU_LSM9DS0.setAccelODR(IMU_LSM9DS0.A_ODR_200); // Set accelerometer update rate at 100 Hz
 // Accelerometer anti-aliasing filter rate can be 50, 194, 362, or 763 Hz
@@ -264,7 +264,7 @@ void init_LSM9DS0() {
 
 // Magnetometer output data rate can be: 3.125 (ODR_3125), 6.25 (ODR_625), 12.5 (ODR_125), 25, 50, or 100 Hz
   IMU_LSM9DS0.setMagODR(IMU_LSM9DS0.M_ODR_125); // Set magnetometer to update every 80 ms
-  
+
 // Use the FIFO mode to average accelerometer and gyro readings to calculate the biases, which can then be removed from
 // all subsequent measurements.
   IMU_LSM9DS0.calLSM9DS0(IMU_LSM9DS0.gbias, IMU_LSM9DS0.abias);
@@ -277,9 +277,9 @@ void measure_LSM9DS0(double y[]) {
 
   // Must be called before updating quaternions!
   IMU_LSM9DS0.updateTime();
-    
+
   // Sensors x- and y-axes are aligned but magnetometer z-axis (+ down) is opposite to z-axis (+ up) of accelerometer and gyro!
-  // This is ok by aircraft orientation standards!  
+  // This is ok by aircraft orientation standards!
   // Pass gyro rate as rad/s
   MadgwickQuaternionUpdate(IMU_LSM9DS0.ax, IMU_LSM9DS0.ay, IMU_LSM9DS0.az,
     IMU_LSM9DS0.gx*DEG_TO_RAD, IMU_LSM9DS0.gy*DEG_TO_RAD, IMU_LSM9DS0.gz*DEG_TO_RAD,
