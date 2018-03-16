@@ -89,10 +89,10 @@ class XboxController(threading.Thread):
         LB = 4
         RB = 5
         BACK = 6
-        START = 7
+        START = 10
         XBOX = 8
         LEFTTHUMB = 9
-        RIGHTTHUMB = 10
+        RIGHTTHUMB = 7
 
     #map between pygame axis (analogue stick) ids and xbox control ids
     AXISCONTROLMAP = {PyGameAxis.LTHUMBX: XboxControls.LTHUMBX,
