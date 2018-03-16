@@ -2,7 +2,7 @@
 #include "Servo.h"
 #include "Motor.h"
 
-const unsigned int T100LUT[POWER_MAX-POWER_MIN+1] = {
+const unsigned int T100LUT[201] = {
 1100,1101,1103,1104,1106,1107,1108,1110,1112,1115,
 1118,1121,1124,1128,1131,1133,1135,1137,1139,1142,
 1146,1150,1153,1155,1157,1160,1162,1165,1168,1171,
@@ -29,7 +29,7 @@ const unsigned int motor_pins[NUM_MOTORS] = {5, 6, 9, 10, 11};
 const bool ccw_motors[NUM_MOTORS] = {false, true, false, true, true};
 Servo motors[NUM_MOTORS];
 int motor_power[NUM_MOTORS];
-
+double droop_factor = 1;
 
 // TODO: Maybe needed for BFM
 void init_LUT() {
@@ -37,16 +37,16 @@ void init_LUT() {
 }
 
 void set_motors() {
-  double df = calc_droop();
+  // double df = calc_droop();
   for (int i = 0; i < NUM_MOTORS; i++) {
-    motor_power[i] *= df;
+    motor_power[i] = (int)((float) motor_power[i] * droop_factor);
     int power_sat = MAX(MIN(motor_power[i],POWER_MAX),POWER_MIN);
     if (ccw_motors[i]) {
       power_sat = -power_sat;
     }
-    unsigned int lut_idx = power_sat - POWER_MIN;
-    // Serial.print(T100LUT[lut_idx]);
-    // Serial.print(',');
+    // unsigned int lut_idx = power_sat - POWER_MIN;
+    unsigned int lut_idx = power_sat + 100;
+
     motors[i].writeMicroseconds(T100LUT[lut_idx]);
   }
   // Serial.println();
@@ -69,12 +69,4 @@ void init_motors() {
     motor_power[i] = 0;
   }
   set_motors();
-}
-
-double calc_droop() {
-  double voltage = (double)analogRead(DROOP_PIN) * 2.56 * 12.0 / (2.5 * 1023.0);
-  Serial.print("Voltage is: "); Serial.println(voltage);
-  double droop_factor = 1;
-  if (voltage < 9) droop_factor = exp(-2.5*(9-voltage));
-  return droop_factor;
 }

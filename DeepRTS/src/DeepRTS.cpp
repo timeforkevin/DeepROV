@@ -15,9 +15,10 @@ typedef enum SerialCommand {
   RollTrimCommand  = (int)'R',
   PitchTrimCommand = (int)'P',
   YawVelCommand    = (int)'Y',
-  XVelCommand      = (int)'X'
+  XVelCommand      = (int)'X',
 } SerialCommand;
 
+#define DROOP_PIN A15
 
 void log_serial();
 void read_serial_csv();
@@ -25,6 +26,7 @@ void read_serial_commands();
 
 unsigned long state_init_time;
 long last_motor_set = 0;
+
 
 void setup() {
 
@@ -53,7 +55,7 @@ void setup() {
   delay(1000);
 
   for (int i = 0; i < NUM_MOTORS; i++) {
-    motor_power[i] = 100;
+    motor_power[i] = POWER_MAX;
   }
   set_motors();
   delay(2000);
@@ -64,14 +66,12 @@ void setup() {
   set_motors();
   delay(1000);
 
-  state_init_time = millis() + 15000;
+  state_init_time = millis() + 10000;
   Serial.println("Serial Ready");
 }
 
 
 void loop() {
-
-
   if (leaky()) {
     // Do the squeaky
     // Can't take this L
@@ -81,7 +81,8 @@ void loop() {
     read_serial_csv();
   }
 
-  // measure_depth(y);
+  measure_depth(y);
+  Serial.print("Depth="); Serial.println(y[0]);
 #ifdef USE_MPU9250
   measure_MPU9250(y);
   double dt = IMU_MPU9250.deltat;
@@ -108,24 +109,27 @@ void loop() {
     controller(mu, motor_power);
   }
 
+  double voltage = (double)analogRead(DROOP_PIN) * 2.56 * 12.0 / (2.5 * 1023.0);
+  Serial.print("Voltage="); Serial.println(voltage);
+  if(voltage < 10) {
+    // droop_factor = exp(-2.5*(10-voltage));
+    droop_factor = 0.5;
+    set_motors();
+  } else {
+    droop_factor = 1;
+  }
+
   if (millis() - last_motor_set > 100) {
     // Execute Control Outputs every 100ms
     last_motor_set = millis();
     set_motors();
   }
   // Logging
-  log_serial();
+  // log_serial();
 }
 
 void log_serial() {
-  // for (int i = 0; i < NUM_MEASURE; i++) {
-  //   Serial.print(y[i],4);
-  //   Serial.print(',');
-  // }
-  // for (int i = 0; i < 4; i++) {
-  //   Serial.print(mu[i]);
-  //   Serial.print(',');
-  // }
+  Serial.println("motor powers:");
   for (int i = 0; i < NUM_MOTORS; i++) {
     Serial.print(motor_power[i]);
     Serial.print(',');
@@ -141,10 +145,10 @@ void read_serial_csv() {
   int counter = 0;
   int lastIndex = 0;
 
-  for (int i = 0; i < input.length(); i++) {
+  for (unsigned int i = 0; i < input.length(); i++) {
     if (input.substring(i, i+1) == "," || input.substring(i, i+1) == "\n") {
-      Serial.print(input.substring(lastIndex, i));
-      Serial.print(',');
+      // Serial.print(input.substring(lastIndex, i));
+      // Serial.print(',');
       switch (counter) {
       case 0:
         dlqr_mode |= ManXVel;
@@ -180,41 +184,5 @@ void read_serial_csv() {
   // Serial.print(man_z_vel);
   // Serial.print(',');
   // Serial.print(man_p_trim);
-  Serial.print(':');
+  // Serial.print(':');
 }
-
-// void read_serial_commands() {
-//   // Reset dlqr_mode
-//   dlqr_mode = FullState;
-//   String s = Serial.readString();
-//   char *line = const_cast<char*> (s.c_str());
-//   char *p_next = line;
-//   bool done = false;
-//   while (*p_next != '\0' && !done) {
-//     switch (*p_next) {
-//     case ZVelCommand:
-//       dlqr_mode |= ManZVel;
-//       man_z_vel = strtod(p_next+1, &p_next);
-//       break;
-//     case RollTrimCommand:
-//       dlqr_mode |= ManRollTrim;
-//       man_r_trim = strtol(p_next+1, &p_next, 10);
-//       break;
-//     case PitchTrimCommand:
-//       dlqr_mode |= ManPitchTrim;
-//       man_p_trim = strtol(p_next+1, &p_next, 10);
-//       break;
-//     case YawVelCommand:
-//       dlqr_mode |= ManYawVel;
-//       man_y_vel = strtod(p_next+1, &p_next);
-//       break;
-//     case XVelCommand:
-//       dlqr_mode |= ManXVel;
-//       man_x_vel = strtol(p_next+1, &p_next, 10);
-//       break;
-//     default:
-//       done = true;
-//       break;
-//     }
-//   }
-// }
