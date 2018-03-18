@@ -1,68 +1,62 @@
 #include "Motor.h"
-#include "LeakDetector.h"
-#include "Sonar.h"
 
 #define NUM_MOTORS 5
-long motor_pwms[5] = {1500, 1500, 1500, 1500};
-double s[2] = {0, 0};
+#define DROOP_PIN A15
+long motor_pwms[5] = {1500, 1500, 1500, 1500, 1500};
 
-void setPWM(long val) {
-  if(val > 10000 && val < 20000) motor_pwms[0] = val - 10000;
-  else if(val > 20000 && val < 30000) motor_pwms[1] = val - 20000;
-  else if(val > 30000 && val < 40000) motor_pwms[2] = val - 30000;
-  else if(val > 40000 && val < 50000) motor_pwms[3] = val - 40000;
-  else if(val > 50000 && val < 60000) motor_pwms[4] = val - 50000;
-}
-
-void parseInput(String input) {
-  int counter = 0;
-  int lastIndex = 0;
-
-  for (int i = 0; i < input.length(); i++) {
-    if (input.substring(i, i+1) == "," || input.substring(i, i+1) == "\n") {
-      setPWM(input.substring(lastIndex, i).toInt());
-      lastIndex = i + 1;
-      counter++;
-    }
-  }
-}
-
-void printPWMs() {
-  for(int i = 0; i < NUM_MOTORS; i++) {
-    Serial.print("motor");
-    Serial.print(i);
-    Serial.print(": ");
-    Serial.print(motor_pwms[i]);
-    if( (i+1) == NUM_MOTORS) Serial.println();
-    else Serial.print(", ");
-  }
-}
 
 void setup() {
   Serial.begin(115200);
-  Serial.setTimeout(20);
-  // init_sonars();
+  Serial.setTimeout(30);
+  analogReference(INTERNAL2V56);
+  delay(5000);
   init_motors();
-  set_motors_raw(motor_pwms);
+
+  double voltage = (double)analogRead(DROOP_PIN) * 2.56 * 12.0 / (2.5 * 1023.0);
+  Serial.print("Voltage="); Serial.println(voltage);
+
+  for (int i = 0; i < NUM_MOTORS; i++) {
+    motor_power[i] = 0;
+  }
+  set_motors();
+  delay(1000);
+
+  for (int i = 0; i < NUM_MOTORS; i++) {
+    motor_power[i] = POWER_MAX;
+  }
+  set_motors();
   delay(2000);
-  // init_leak_detector();
+
+  for (int i = 0; i < NUM_MOTORS; i++) {
+    motor_power[i] = 0;
+  }
+  set_motors();
+  delay(1000);
 }
 
 void loop() {
-  // if(leaky()) {
-  //   // Took the L
-  // } else {
-  //   while(Serial.available() > 0) {
-  //     parseInput(Serial.readString());
-  //     printPWMs();
-  //     set_motors_raw(motor_pwms);
-  //   }
-  // }
+  // run the motors forward
 
-  while(Serial.available() > 0) {
-    parseInput(Serial.readString());
-    printPWMs();
+  motor_pwms[0] = motor_pwms[1] = 1500;
+  set_motors_raw(motor_pwms);
+  delay(1000);
+
+  for(long i = 1500; i <= 1700; i += 10) {
+    motor_pwms[0] += 10;
+    motor_pwms[1] -= 10;
     set_motors_raw(motor_pwms);
+    double voltage = (double)analogRead(DROOP_PIN) * 2.56 * 12.0 / (2.5 * 1023.0);
+    Serial.print("Voltage="); Serial.println(voltage);
+    delay(1500);
   }
 
+  // run the motors backwards
+  for(long i = 1700; i >= 1500; i -= 10) {
+    motor_pwms[0] -= 10;
+    motor_pwms[1] += 10;
+    set_motors_raw(motor_pwms);
+    double voltage = (double)analogRead(DROOP_PIN) * 2.56 * 12.0 / (2.5 * 1023.0);
+    Serial.print("Voltage="); Serial.println(voltage);
+    delay(1500);
+  }
 }
