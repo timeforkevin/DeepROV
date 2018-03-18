@@ -6,9 +6,9 @@
 
 #define POWER_MAX 100
 #define POWER_MIN -100
-#define NUM_MOTORS 10
+#define NUM_MOTORS 5
 #define RAMP_FACTOR 2
-#define RAMP_THRESHOLD 5
+#define RAMP_THRESHOLD 10
 #define MIN(X,Y) (((X) < (Y)) ? (X) : (Y))
 #define MAX(X,Y) (((X) > (Y)) ? (X) : (Y))
 
