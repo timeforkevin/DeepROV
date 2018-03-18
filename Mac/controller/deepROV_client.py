@@ -10,10 +10,9 @@ COMMAND_MAP = {
     'Y': '0',
     'P': '0',
     'R': '0',
-    'S': '0'
 }
 
-MAX = 80
+MAX = 65
 
 def build_msg():
     msg = COMMAND_MAP['X'] + ',' + COMMAND_MAP['R'] + ',' + COMMAND_MAP['Y'] \
@@ -32,11 +31,11 @@ def left_thumb_y(val):
 
 def right_trigger(val):
     # 1mm = 0.04 inches
-    val = round(val * 0.01, 2)
+    val = round(val * 0.025, 2)
     COMMAND_MAP['Z'] = str(val)
 
 def left_trigger(val):
-    val = round(-val * 0.01, 2)
+    val = round(-val * 0.02, 2)
     COMMAND_MAP['Z'] = str(val)
 
 def Y(val):
