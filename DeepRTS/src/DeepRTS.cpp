@@ -164,7 +164,7 @@ void read_serial_csv() {
         break;
       case 3:
         dlqr_mode |= ManZVel;
-        man_z_vel = (double)input.substring(lastIndex, i).toInt();
+        man_z_vel = input.substring(lastIndex, i).toDouble();
         break;
       case 4:
         dlqr_mode |= ManPitchTrim;
