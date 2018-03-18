@@ -47,6 +47,10 @@ void set_motors() {
     unsigned int lut_idx = power_sat + 100;
 
     motors[i].writeMicroseconds(T100LUT[lut_idx]);
+    Serial.print(i); Serial.print("="); Serial.print(T100LUT[lut_idx]); Serial.print("; ");
+    if((i+1) == NUM_MOTORS) {
+      Serial.println();
+    }
   }
 }
 
