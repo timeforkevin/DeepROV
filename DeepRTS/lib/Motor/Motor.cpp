@@ -28,12 +28,47 @@ const unsigned int T100LUT[201] = {
 const unsigned int motor_pins[NUM_MOTORS] = {5, 6, 9, 10, 11};
 const bool ccw_motors[NUM_MOTORS] = {false, true, false, true, true};
 Servo motors[NUM_MOTORS];
+int prev_motor_power[NUM_MOTORS];
 int motor_power[NUM_MOTORS];
+
 double droop_factor = 1;
 
-// TODO: Maybe needed for BFM
-void init_LUT() {
+int pwm(int power, int i) {
+  int power_sat = MAX(MIN(power,POWER_MAX),POWER_MIN);
+  if (ccw_motors[i]) {
+    power_sat = -power_sat;
+  }
+  unsigned int lut_idx = power_sat + 100;
+  return T100LUT[lut_idx];
+}
 
+void ramp_motors() {
+  for(int i = 0; i < NUM_MOTORS; i++) {
+    motor_power[i] = (int)((float) motor_power[i] * droop_factor);
+    int curr_power = motor_power[i];
+    int prev_power = prev_motor_power[i];
+    int diff = abs(prev_power - curr_power);
+
+    int power;
+    if(diff > RAMP_THRESHOLD) {
+      int power_step = diff / RAMP_FACTOR;
+
+      if(prev_power < curr_power) {
+        power = prev_power + power_step;
+      } else {
+        power = prev_power - power_step;
+      }
+
+      prev_motor_power[i] = power;
+
+    } else {
+      power = prev_motor_power[i] = motor_power[i];
+    }
+
+    int pwm_val = pwm(power, i);
+    motors[i].writeMicroseconds(pwm_val);
+    Serial.print(i); Serial.print("="); Serial.print(pwm_val); Serial.print("; ");
+  }
 }
 
 void set_motors() {
@@ -62,13 +97,13 @@ void set_motors_raw(long *pwms) {
 }
 
 void init_motors() {
-  init_LUT();
   for (int i = 0; i < NUM_MOTORS; i++) {
     motors[i].attach(motor_pins[i]);
   }
   // Stop Motors
   for (int i = 0; i < NUM_MOTORS; i++) {
     motor_power[i] = 0;
+    prev_motor_power[i] = 0;
   }
   set_motors();
 }

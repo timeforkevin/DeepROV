@@ -82,7 +82,6 @@ void loop() {
   }
 
   measure_depth(y);
-  // Serial.print("Depth="); Serial.println(y[0]);
 #ifdef USE_MPU9250
   measure_MPU9250(y);
   double dt = IMU_MPU9250.deltat;
@@ -112,17 +111,15 @@ void loop() {
   double voltage = (double)analogRead(DROOP_PIN) * 2.56 * 12.0 / (2.5 * 1023.0);
   Serial.print("Voltage="); Serial.println(voltage);
   if(voltage < 10) {
-    // droop_factor = exp(-2.5*(10-voltage));
     droop_factor = 0.5;
-    set_motors();
   } else {
     droop_factor = 1;
   }
 
-  if (millis() - last_motor_set > 100) {
-    // Execute Control Outputs every 100ms
+  if (millis() - last_motor_set > 75) {
+    // Execute Control Outputs every 75ms
     last_motor_set = millis();
-    set_motors();
+    ramp_motors();
   }
   // Logging
   // log_serial();
@@ -147,8 +144,6 @@ void read_serial_csv() {
 
   for (unsigned int i = 0; i < input.length(); i++) {
     if (input.substring(i, i+1) == "," || input.substring(i, i+1) == "\n") {
-      // Serial.print(input.substring(lastIndex, i));
-      // Serial.print(',');
       switch (counter) {
       case 0:
         dlqr_mode |= ManXVel;
@@ -175,14 +170,4 @@ void read_serial_csv() {
       counter++;
     }
   }
-  // Serial.print(man_x_vel);
-  // Serial.print(',');
-  // Serial.print(man_r_trim);
-  // Serial.print(',');
-  // Serial.print(man_y_vel);
-  // Serial.print(',');
-  // Serial.print(man_z_vel);
-  // Serial.print(',');
-  // Serial.print(man_p_trim);
-  // Serial.print(':');
 }
