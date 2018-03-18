@@ -23,11 +23,11 @@ void measure_depth(double y[]) {
     acc += analogRead(depth_pin);
   }
   double a = ((double)acc) / NUM_SAMPLES;
-  
+
   double p = (a-SCALE_AMIN)
            / (SCALE_AMAX-SCALE_AMIN)
            * (SCALE_PMAX-SCALE_PMIN)
            + SCALE_PMIN;
   double depth = (p-PRESSURE_OFFSET)/SCALE_PRESSURE_DEPTH;
-  y[0] = depth;
+  // y[0] = depth;
 }

@@ -37,7 +37,6 @@ void init_LUT() {
 }
 
 void set_motors() {
-  // double df = calc_droop();
   for (int i = 0; i < NUM_MOTORS; i++) {
     motor_power[i] = (int)((float) motor_power[i] * droop_factor);
     int power_sat = MAX(MIN(motor_power[i],POWER_MAX),POWER_MIN);
@@ -49,7 +48,6 @@ void set_motors() {
 
     motors[i].writeMicroseconds(T100LUT[lut_idx]);
   }
-  // Serial.println();
 }
 
 void set_motors_raw(long *pwms) {
