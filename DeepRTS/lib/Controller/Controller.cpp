@@ -1,4 +1,4 @@
-#define fdg_fact (1.2)
+#define fdg_fact (1.5)
 
 #include "Controller.h"
 
