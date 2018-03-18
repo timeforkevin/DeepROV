@@ -82,7 +82,7 @@ void loop() {
   }
 
   measure_depth(y);
-  Serial.print("Depth="); Serial.println(y[0]);
+  // Serial.print("Depth="); Serial.println(y[0]);
 #ifdef USE_MPU9250
   measure_MPU9250(y);
   double dt = IMU_MPU9250.deltat;

@@ -29,5 +29,6 @@ void measure_depth(double y[]) {
            * (SCALE_PMAX-SCALE_PMIN)
            + SCALE_PMIN;
   double depth = (p-PRESSURE_OFFSET)/SCALE_PRESSURE_DEPTH;
+  Serial.print("Depth="); Serial.println(depth);
   // y[0] = depth;
 }

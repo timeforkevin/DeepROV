@@ -131,7 +131,7 @@ void man_control() {
   target[3] = mu[3];
   if (dlqr_mode & ManYawVel) {
     // Set target velocity states to manual control
-    target[7] = man_y_vel;
+    target[7] = man_y_vel * DEG_TO_RAD;
   } else {
     // Reset Velocity Command
     target[7] = 0;
