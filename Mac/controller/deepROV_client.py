@@ -12,7 +12,7 @@ COMMAND_MAP = {
     'R': '0',
 }
 
-MAX = 65
+MAX = 60
 
 def build_msg():
     msg = COMMAND_MAP['X'] + ',' + COMMAND_MAP['R'] + ',' + COMMAND_MAP['Y'] \
@@ -20,22 +20,17 @@ def build_msg():
     return msg
 
 def left_thumb_x(val):
-    # out = int(abs(val) * 2 / MAX)
-    out = val/8
-    if val < 0:
-        out = -out
-    COMMAND_MAP['Y'] = str(round(out, 2))
+    COMMAND_MAP['Y'] = str(round(val/5, 2))
 
 def left_thumb_y(val):
     COMMAND_MAP['X'] = str(int(val))
 
 def right_trigger(val):
-    # 1mm = 0.04 inches
     val = round(val * 0.025, 2)
     COMMAND_MAP['Z'] = str(val)
 
 def left_trigger(val):
-    val = round(-val * 0.02, 2)
+    val = round(-val * 0.025, 2)
     COMMAND_MAP['Z'] = str(val)
 
 def Y(val):
@@ -71,7 +66,7 @@ if __name__ == '__main__':
     def controlCallBack(xboxControlId, value):
         print("Control Id = {}, Value = {}".format(xboxControlId, value))
 
-    xboxCont = XboxController(deadzone = 30, scale = MAX, invertYAxis = True)
+    xboxCont = XboxController(deadzone = 30, scale = MAX, invertYAxis = False)
 
     xboxCont.setupControlCallback(xboxCont.XboxControls.LTHUMBX, left_thumb_x)
     xboxCont.setupControlCallback(xboxCont.XboxControls.LTHUMBY, left_thumb_y)
