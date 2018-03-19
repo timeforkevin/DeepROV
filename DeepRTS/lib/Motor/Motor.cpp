@@ -33,19 +33,10 @@ int motor_power[NUM_MOTORS];
 
 double droop_factor = 1;
 
-int pwm(int power, int i) {
-  int power_sat = MAX(MIN(power,POWER_MAX),POWER_MIN);
-  if (ccw_motors[i]) {
-    power_sat = -power_sat;
-  }
-  unsigned int lut_idx = power_sat + 100;
-  return T100LUT[lut_idx];
-}
-
 void ramp_motors() {
   for(int i = 0; i < NUM_MOTORS; i++) {
     motor_power[i] = (int)((float) motor_power[i] * droop_factor);
-    int curr_power = motor_power[i];
+    int curr_power = MAX(MIN(motor_power[i],POWER_MAX),POWER_MIN);;
     int prev_power = prev_motor_power[i];
     int diff = abs(prev_power - curr_power);
 
@@ -62,12 +53,16 @@ void ramp_motors() {
       prev_motor_power[i] = power;
 
     } else {
-      power = prev_motor_power[i] = motor_power[i];
+      power = prev_motor_power[i] = curr_power;
     }
 
-    int pwm_val = pwm(power, i);
-    motors[i].writeMicroseconds(pwm_val);
-    Serial.print(i); Serial.print("="); Serial.print(pwm_val); Serial.print("; ");
+    if (ccw_motors[i]) {
+      power = -power;
+    }
+    unsigned int lut_idx = power + 100;
+
+    motors[i].writeMicroseconds(T100LUT[lut_idx]);
+    Serial.print(i); Serial.print("="); Serial.print(T100LUT[lut_idx]); Serial.print("; ");
   }
 }
 
