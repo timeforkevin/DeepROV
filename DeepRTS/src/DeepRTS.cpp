@@ -66,7 +66,7 @@ void setup() {
   set_motors();
   delay(1000);
 
-  state_init_time = millis() + 10000;
+  state_init_time = millis() + 100000;
   Serial.println("Serial Ready");
 }
 
@@ -108,8 +108,15 @@ void loop() {
     controller(mu, motor_power);
   }
 
+  Serial.print("IMU: ");
+  Serial.print("yaw="); Serial.print(mu[3] * RAD_TO_DEG); Serial.print(";");
+  Serial.print("pitch="); Serial.print(mu[2] * RAD_TO_DEG); Serial.print(";");
+  Serial.print("roll="); Serial.print(mu[1] * RAD_TO_DEG); Serial.print(";");
+
+  Serial.println();
+
   double voltage = (double)analogRead(DROOP_PIN) * 2.56 * 12.0 / (2.5 * 1023.0);
-  Serial.print("Voltage="); Serial.println(voltage);
+  Serial.print("Voltage: "); Serial.println(voltage);
   if(voltage < 10) {
     droop_factor = 0.5;
   } else {
@@ -119,7 +126,7 @@ void loop() {
   if (millis() - last_motor_set > 75) {
     // Execute Control Outputs every 75ms
     last_motor_set = millis();
-    ramp_motors();
+    // ramp_motors();
   }
   // Logging
   // log_serial();

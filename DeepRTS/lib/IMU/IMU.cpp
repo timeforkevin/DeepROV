@@ -14,7 +14,7 @@ void init_LSM9DS1() {
   IMU_LSM9DS1.settings.device.mAddress = LSM9DS1_M;
   IMU_LSM9DS1.settings.device.agAddress = LSM9DS1_AG;
   if (!IMU_LSM9DS1.begin()) {
-    Serial.println("Failed to communicate with LSM9DS1.");
+    // Serial.println("Failed to communicate with LSM9DS1.");
   }
 // Set data output ranges; choose lowest ranges for maximum resolution
 // Accelerometer scale can be: A_SCALE_2G, A_SCALE_4G, A_SCALE_6G, A_SCALE_8G, or A_SCALE_16G
@@ -234,10 +234,10 @@ void init_LSM9DS0() {
   // make sure communication was successful.
   uint32_t status = IMU_LSM9DS0.begin();
 
-  Serial.print("LSM9DS0 WHO_AM_I's returned: 0x");
-  Serial.println(status, HEX);
-  Serial.println("Should be 0x49D4");
-  Serial.println();
+  // Serial.print("LSM9DS0 WHO_AM_I's returned: 0x");
+  // Serial.println(status, HEX);
+  // Serial.println("Should be 0x49D4");
+  // Serial.println();
   delay(2000);
 
 // Set data output ranges; choose lowest ranges for maximum resolution

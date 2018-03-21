@@ -34,6 +34,7 @@ int motor_power[NUM_MOTORS];
 double droop_factor = 1;
 
 void ramp_motors() {
+  Serial.print("MOTORS: ");
   for(int i = 0; i < NUM_MOTORS; i++) {
     motor_power[i] = (int)((float) motor_power[i] * droop_factor);
     int curr_power = MAX(MIN(motor_power[i],POWER_MAX),POWER_MIN);;
@@ -62,7 +63,8 @@ void ramp_motors() {
     unsigned int lut_idx = power + 100;
 
     motors[i].writeMicroseconds(T100LUT[lut_idx]);
-    Serial.print(i); Serial.print("="); Serial.print(T100LUT[lut_idx]); Serial.print("; ");
+    Serial.print(i); Serial.print("="); Serial.print(T100LUT[lut_idx]); Serial.print(";");
+    if((i+1) == NUM_MOTORS) Serial.println();
   }
 }
 
@@ -77,10 +79,10 @@ void set_motors() {
     unsigned int lut_idx = power_sat + 100;
 
     motors[i].writeMicroseconds(T100LUT[lut_idx]);
-    Serial.print(i); Serial.print("="); Serial.print(T100LUT[lut_idx]); Serial.print("; ");
-    if((i+1) == NUM_MOTORS) {
-      Serial.println();
-    }
+    // Serial.print(i); Serial.print("="); Serial.print(T100LUT[lut_idx]); Serial.print("; ");
+    // if((i+1) == NUM_MOTORS) {
+    //   Serial.println();
+    // }
   }
 }
 
